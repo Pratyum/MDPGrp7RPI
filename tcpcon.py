@@ -1,7 +1,7 @@
 import socket
 import sys
 
-TCP_IP = "192.168.7.1"
+TCP_IP = "192.168.0.55"
 TCP_LISTEN_PORT = 13377
 BUFFER_SIZE = 512
 
@@ -23,15 +23,15 @@ class Tcpcon(object):
 		"""
 		try:
 			self.tcpip_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			self.tcpip_sock.bind(self.ip_addr, self.listen_port)
+			self.tcpip_sock.bind((self.listen_addr, self.listen_port))
 			self.tcpip_sock.listen(1)
 			print("[DEBUG]: TCPIP Socket Listening.\n")
 			#listening, accept incoming connections
-			self.client_conn, self.outbound_addr = self.tcpip_conn.accept()
-			print "[DEBUG]: connected to: ", self.client_conn
+			self.client_conn, self.outbound_addr = self.tcpip_sock.accept()
+			print "[DEBUG]: connected to: ", str(self.client_conn)
 			print "[DEBUG]: connected on: ", self.outbound_addr
 			self.connected = True
-		except Exception e:
+		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
 
 	def close(self):
@@ -40,7 +40,7 @@ class Tcpcon(object):
 			print "[DEBUG]: Stopping tcpip listener"
 		if self.client_conn:
 			self.client_conn.close()
-			print "[DEBUG]: Cutting client connection"
+			print "[DEBUG]: Closing client connection"
 
 	def receive(self):
 		"""
@@ -51,13 +51,26 @@ class Tcpcon(object):
 			algo_inst = self.client_conn.recv(BUFFER_SIZE)
 			print "[DEBUG]: Received: ", algo_inst
 			return algo_inst
-		except Exception e:
+		except Exception, e:
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error receiving data from algo software."
 
 	def send(self, payload):
+		"""
+		Send msg to algo software
+		"""
 		try:
 			self.client_conn.sendto(payload, self.outbound_addr)
-		except Exception e:
+		except Exception, e:
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error sending."
+
+
+#if __name__=="__main__":
+#	tcpsk = Tcpcon()
+#	tcpsk.listen()
+#
+#	print "recv"
+#	payload = tcpsk.receive()
+#	print payload
+#	tcpsk.close()
