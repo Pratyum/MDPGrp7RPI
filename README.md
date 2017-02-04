@@ -19,4 +19,4 @@ PYTHON PYTHON PYTHON
 
 ## Control Flow from Nexus
 
-|Nexus|--BT-->|RPI COMMSW|--WIFI-->|PC ALGO|--WIFI-->|RPI COMMSW|-->|ARDUINO|
+`|Nexus|--BT-->|RPI COMMSW|--WIFI-->|PC ALGO|--WIFI-->|RPI COMMSW|-->|ARDUINO|`
