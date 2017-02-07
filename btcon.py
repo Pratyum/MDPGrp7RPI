@@ -17,14 +17,15 @@ class BTcon(object):
 
 	def listen(self):
 		try:
-			self.server_sock = BluetoothSocket( bluetooth.RFCOMM )
+			self.server_sock = BluetoothSocket( RFCOMM )
 			self.server_sock.bind( ("",self.channel) )
-			server_sock.listen(1)
+			self.server_sock.listen(1)
 			print ("[INFO]: Bluetooth listening on channel %d" % self.channel)
 			self.client_sock, self.outbound_addr = self.server_sock.accept() 
 			print "[INFO]: connected to: ", str(self.client_sock)
 			print "[INFO]: connected on: ", self.outbound_addr
-			self.connected = True
+			if self.client_sock:
+				self.connected = True
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
 
@@ -59,12 +60,12 @@ class BTcon(object):
 if __name__ == "__main__":
 	btconn = BTcon()
 	btconn.listen()
+	if btconn.is_connected:
+		msg = "much connection so estab"
+		print("Writing %s" % msg)
+		btconn.send(msg)
 
-	msg = "much connection so estab"
-	print("Writing %s" % msg)
-	btconn.send(msg)
-
-	incoming = bt.receive()
-	print("RECV %s" % incoming)
+		incoming = bt.receive()
+		print("RECV %s" % incoming)
 
 	btconn.close()

@@ -30,7 +30,8 @@ class Tcpcon(object):
 			self.client_conn, self.outbound_addr = self.tcpip_sock.accept()
 			print "[INFO]: connected to: ", str(self.client_conn)
 			print "[INFO]: connected on: ", self.outbound_addr
-			self.connected = True
+			if self.client_conn:
+				self.connected = True
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
 
@@ -66,11 +67,12 @@ class Tcpcon(object):
 			print "[ERROR]: Error sending."
 
 
-#if __name__=="__main__":
-#	tcpsk = Tcpcon()
-#	tcpsk.listen()
-#
-#	print "recv"
-#	payload = tcpsk.receive()
-#	print payload
-#	tcpsk.close()
+if __name__=="__main__":
+	tcpsk = Tcpcon()
+	tcpsk.listen()
+	if tcpsk.is_connected:
+		print "Connected."
+	print "recv"
+	payload = tcpsk.receive()
+	print payload
+	tcpsk.close()
