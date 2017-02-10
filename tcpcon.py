@@ -1,7 +1,7 @@
 import socket
 import sys
 
-TCP_IP = "192.168.7.1" #change this
+TCP_IP = "127.0.0.1" #change this
 TCP_LISTEN_PORT = 13377
 BUFFER_SIZE = 512
 
@@ -72,7 +72,8 @@ if __name__=="__main__":
 	tcpsk.listen()
 	if tcpsk.is_connected:
 		print "Connected."
-	print "recv"
-	payload = tcpsk.receive()
-	print payload
-	tcpsk.close()
+	        print "recv"
+	        while True:
+                        payload = tcpsk.receive()
+	                print payload
+	        #tcpsk.close()
