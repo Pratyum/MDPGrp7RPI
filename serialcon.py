@@ -18,7 +18,8 @@ class Seriouscon(object):
 		"""
 		try:
 			self.serial_conn = serial.Serial(self.serial_port, self.baud_rate)
-			self.connected = True
+			if self.serial_conn:
+				self.connected = True
 			print("[INFO] Established connection to serial port")
 		except Exception, e:
 			print("[ERROR] Unable to establish connection. %s" e)
@@ -50,13 +51,17 @@ class Seriouscon(object):
 if __name__ == "__main__":
 	sercon = Seriouscon()
 	sercon.listen()
-
-	data = "much data so send."
-	print("sending to serial")
-	sercon.send(data)
-
+	if sercon.is_connected:
+		data = "ABC"
+		print("sending to serial")
+		sercon.send(data)
+		while True:
+			recv = sercon.receive()
+			print("Received %s" % recv)
+			if recv:
+				sercon.close()
+				exit()
+		
 	#arduino sends something
 	#so recv it
-	print("Received data from arduino. %s" % sercon.receive())
-	print("Ending test, closing connection")
-	sercon.close()
+	

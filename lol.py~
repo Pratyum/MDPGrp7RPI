@@ -1,0 +1,51 @@
+cheki_price = 500
+twoshot_price = 1000
+avg_no_cheki_per_oshi_per_visit = 2
+avg_no_2s_per_shukkin_cycle = 1.5
+no_oshi = 3
+
+entry_fee = 1000
+d3_counter_fee = 500
+d2_fee = 200
+
+chance_d2 = 0.4
+chance_d3 = 0.4
+chance_d1 = 0.2
+
+main_food = 700
+orikaku = 1000
+sub_food = 500
+
+avg_shukkin_per_cycle = 8
+cycles = 3
+
+main_food_chance = 0.4
+sub_food_chance = 0.3
+no_food_chance = 0.3
+orikaku_chance = 0.01
+no_orikaku_chance = 1 - orikaku_chance
+
+total_no_visit = avg_shukkin_per_cycle * cycles
+total_oneshot = total_no_visit * avg_no_cheki_per_oshi_per_visit * no_oshi
+total_twoshot = total_no_visit * avg_no_2s_per_shukkin_cycle 
+total_cost_oneshot = cheki_price * avg_no_cheki_per_oshi_per_visit * no_oshi * total_no_visit
+total_cost_twoshot = twoshot_price * avg_no_2s_per_shukkin_cycle * no_oshi
+
+total_cost_entry = total_no_visit * entry_fee * 1.5
+total_cost_seat = total_no_visit*1.5 * ( (0.4*500) + (0.4*200) )
+total_cost_entry_seat = total_cost_entry + total_cost_seat
+
+total_cost_food = (main_food_chance * main_food + sub_food_chance * sub_food + orikaku_chance * orikaku)* (chance_d2 + chance_d3)*total_no_visit
+
+total_cost = total_cost_oneshot + total_cost_twoshot + total_cost_entry +total_cost_seat + total_cost_food
+
+print ("Total no. of visit: %f" % (total_no_visit*1.5))
+print("Total no. of Oneshot: %d" % total_oneshot)
+print ("Total cost of one shot: %d" % total_cost_oneshot)
+print("Total no. of twoshot: %d" % total_twoshot)
+print ("Total cost of two shot: %d" % total_cost_twoshot)
+print("Total cost entry: %d" % total_cost_entry)
+print("Total cost seat: %d" % total_cost_seat)
+print("Total overhead cost: %d" %total_cost_entry_seat)
+print("Total cost of food: %d", total_cost_food)
+print("Total cost: %d" % total_cost)
