@@ -86,7 +86,7 @@ def wifiReceive():
                 #send to android
                 btQueue.append(tempBuffer[1:])
             else:
-                print("BT RECEIVE: ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR")
+                print("WIFI RECEIVE: ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR")
                 
             print("%s: Message From Wifi: %s" %(time.ctime(), message))
         time.sleep(0.5)
