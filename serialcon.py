@@ -17,7 +17,7 @@ class Seriouscon(object):
 		Establish serial connection
 		"""
 		try:
-			self.serial_conn = serial.Serial(self.serial_port, self.baud_rate)
+			self.serial_conn = serial.Serial(self.serial_port, self.baud_rate, timeout = 2)
 			if self.serial_conn:
 				self.connected = True
 			print("[INFO] Established connection to serial port")
@@ -51,16 +51,18 @@ class Seriouscon(object):
 if __name__ == "__main__":
 	sercon = Seriouscon()
 	sercon.listen()
-	if sercon.is_connected:
-		data = "ABC"
+	if sercon.is_connected():
+#		data = "ABC"
 		print("sending to serial")
-		sercon.send(data)
-		while True:
-			recv = sercon.receive()
+#		sercon.send(data)
+                lol = 0
+		while lol < 10:
+                        sercon.send(str(lol))
+                        recv = sercon.receive()
 			print("Received %s" % recv)
-			if recv:
-				sercon.close()
-				exit()
+                        lol += 1
+		sercon.close()
+		exit()
 		
 	#arduino sends something
 	#so recv it

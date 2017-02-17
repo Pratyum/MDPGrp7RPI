@@ -76,4 +76,4 @@ if __name__=="__main__":
 	        while True:
                         payload = tcpsk.receive()
 	                print payload
-	        #tcpsk.close()
+	        tcpsk.close()
