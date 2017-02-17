@@ -26,9 +26,13 @@ def serialReceive():
     while True:
         tempBuffer = serialCon.receive()
         if (tempBuffer != ''):
-            btQueue.append(tempBuffer)
-            wifiQueue.append(tempBuffer)
-            print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+
+            if (str(tempBuffer)[0] == 'e'):
+                btQueue.append(tempBuffer[1:])                
+                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+            #Might not need an 'if' statement here if serial only sends to algo? 
+            #wifiQueue.append(tempBuffer)
+            
         time.sleep(0.5)
 
 def serialSend():
@@ -51,8 +55,15 @@ def btReceive():
     while True:
         tempBuffer = bToothCon.receive()
         if(tempBuffer != ''):
-            serialQueue.append(tempBuffer)
-            wifiQueue.append(tempBuffer)
+            if (str(tempBuffer)[0] == 'c'):
+                #Send manual movement to robot
+                serialQueue.append(tempBuffer[1:])
+            elif (str(tempBuffer)[0] == 'd'):
+                #Tell algo to start exploration/fastest path
+                wifiQueue.append(tempBuffer[1:])
+            else:
+                print("BT RECEIVE: ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR")
+                
             print("%s: Message from Bluetooth: %s" %s (time.ctime(), message))
         time.sleep(0.5)
 
@@ -68,8 +79,15 @@ def wifiReceive():
     while True:
         tempBuffer = wifiCon.receive()
         if(tempBuffer != ''):
-            btQueue.append(tempBuffer)
-            serialQueue.append(tempBuffer)
+            if(str(tempBuffer)[0] == 'a'):
+                #send to robot
+                serialQueue.append(tempBuffer[1:])
+            elif(str(tempBuffer)[0] == 'b'):
+                #send to android
+                btQueue.append(tempBuffer[1:])
+            else:
+                print("BT RECEIVE: ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR")
+                
             print("%s: Message From Wifi: %s" %(time.ctime(), message))
         time.sleep(0.5)
 
