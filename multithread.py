@@ -1,5 +1,4 @@
-
-import _thread #or just 'thread' for <python3
+import thread #or just '_thread' for python3
 import time
 import serial #sudo pip/pip3 install pyserial
 
@@ -23,15 +22,15 @@ wificon.listen()
 print("Connections running")
 
 def serialReceive():
+    #Incoming data from Arduino
     while True:
         tempBuffer = serialCon.receive()
         if (tempBuffer != ''):
-
             if (str(tempBuffer)[0] == 'e'):
                 btQueue.append(tempBuffer[1:])                
                 print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
-            #Might not need an 'if' statement here if serial only sends to algo? 
-            #wifiQueue.append(tempBuffer)
+            else:
+                print("|Error - Serial Receive: " + tempBuffer)
             
         time.sleep(0.5)
 
@@ -62,9 +61,9 @@ def btReceive():
                 #Tell algo to start exploration/fastest path
                 wifiQueue.append(tempBuffer[1:])
             else:
-                print("BT RECEIVE: ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR")
+                print("| ERROR ERROR | BT RECEIVE: " + tempBuffer)
                 
-            print("%s: Message from Bluetooth: %s" %s (time.ctime(), message))
+            print("%s: Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
         time.sleep(0.5)
 
 def wifiSend():
@@ -86,14 +85,14 @@ def wifiReceive():
                 #send to android
                 btQueue.append(tempBuffer[1:])
             else:
-                print("WIFI RECEIVE: ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR")
+                print("|Error - WIFI RECEIVE: " + tempBuffer)
                 
-            print("%s: Message From Wifi: %s" %(time.ctime(), message))
+            print("%s: Message From Wifi: %s" %(time.ctime(), tempBuffer))
         time.sleep(0.5)
 
 
 serialQueue = deque([])
-bToothQueue = deque([])
+btQueue = deque([])
 wifiQueue = deque([])
 
 thread.start_new_thread(wifiSend, ())
