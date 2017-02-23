@@ -22,7 +22,7 @@ class Seriouscon(object):
 				self.connected = True
 			print("[INFO] Established connection to serial port")
 		except Exception, e:
-			print("[ERROR] Unable to establish connection. %s" e)
+			print("[ERROR] Unable to establish connection. %s" %e)
 
 	def is_connected(self):
 		return self.connected
