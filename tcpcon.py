@@ -14,7 +14,7 @@ class Tcpcon(object):
 		self.client_conn = None
 		self.tcpip_sock = None
 
-	def is_connected(self):
+	def is_connected(self): #returns true if tcp listener is listening
 		return self.connected
 
 	def listen(self):
@@ -50,11 +50,12 @@ class Tcpcon(object):
 
 		try:
 			inst = self.client_conn.recv(BUFFER_SIZE)
-			print "[INFO]: Received: ", inst
+			#print "[INFO]: Received: ", inst
 			return inst
 		except Exception, e:
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error receiving data from algo software."
+			self.connected = False
 
 	def send(self, payload):
 		"""
@@ -70,10 +71,12 @@ class Tcpcon(object):
 if __name__=="__main__":
 	tcpsk = Tcpcon()
 	tcpsk.listen()
-	if tcpsk.is_connected:
-		print "Connected."
-	        print "recv"
-	        while True:
-                        payload = tcpsk.receive()
-	                print payload
-	        #tcpsk.close()
+	if tcpsk.is_connected():
+                print "Connected."
+	        print "recving"
+        while tcpsk.is_connected():
+                payload = tcpsk.receive()
+	        if payload:
+	            	print payload
+        print("Closing connection")
+        tcpsk.close()
