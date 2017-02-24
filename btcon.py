@@ -51,7 +51,7 @@ class BTcon(object):
 			self.client_sock.send(payload)
 		except BluetoothError, be:
 			print("[ERROR] Error sending to BLUETOOTH.")
-			print be
+			print (be)
 			self.listen()
 
 
@@ -60,12 +60,14 @@ class BTcon(object):
 if __name__ == "__main__":
 	btconn = BTcon()
 	btconn.listen()
-	if btconn.is_connected:
-		msg = "much connection so estab"
-		print("Writing %s" % msg)
-		btconn.send(msg)
-
-		incoming = bt.receive()
-		print("RECV %s" % incoming)
-
-	btconn.close()
+        print("[INFO] BT listening.")
+        try:
+	        if btconn.is_connected():
+		        msg = "much connection so estab"
+		        print("Writing %s" % msg)
+		        btconn.send(msg)
+                        
+		        incoming = bt.receive()
+		        print("RECV %s" % incoming)
+        except KeyboardInterrupt:
+	        btconn.close()
