@@ -67,7 +67,7 @@ if __name__ == "__main__":
 		        print("Writing %s" % msg)
 		        btconn.send(msg)
                         
-		        incoming = bt.receive()
+		        incoming = btconn.receive()
 		        print("RECV %s" % incoming)
         except KeyboardInterrupt:
 	        btconn.close()
