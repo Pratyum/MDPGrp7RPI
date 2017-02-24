@@ -74,9 +74,10 @@ if __name__=="__main__":
 	if tcpsk.is_connected():
                 print "Connected."
 	        print "recving"
-        while tcpsk.is_connected():
-                payload = tcpsk.receive()
-	        if payload:
-	            	print payload
+                while tcpsk.is_connected():
+                        payload = tcpsk.receive()
+	                if payload:
+	            	        print payload
         print("Closing connection")
         tcpsk.close()
+

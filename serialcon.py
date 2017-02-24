@@ -17,7 +17,7 @@ class Seriouscon(object):
 		Establish serial connection
 		"""
 		try:
-			self.serial_conn = serial.Serial(self.serial_port, self.baud_rate)
+			self.serial_conn = serial.Serial(self.serial_port, self.baud_rate, timeout = 2)
 			if self.serial_conn:
 				self.connected = True
 			print("[INFO] Established connection to serial port")
@@ -54,6 +54,7 @@ class Seriouscon(object):
 if __name__ == "__main__":
 	sercon = Seriouscon()
 	sercon.listen()
+
 	if sercon.is_connected:
 		data = "ABC\n"
 		print("sending to serial")
