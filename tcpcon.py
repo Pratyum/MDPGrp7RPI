@@ -50,7 +50,6 @@ class Tcpcon(object):
 
 		try:
 			inst = self.client_conn.recv(BUFFER_SIZE)
-			#print "[INFO]: Received: ", inst
 			return inst
 		except Exception, e:
 			print "[ERROR]: ", str(e)
@@ -77,7 +76,8 @@ if __name__=="__main__":
                 while tcpsk.is_connected():
                         payload = tcpsk.receive()
 	                if payload:
-	            	        print payload
+	            	        print payload.rstrip()
+                                tcpsk.send("feedback: " + payload)
         print("Closing connection")
         tcpsk.close()
 

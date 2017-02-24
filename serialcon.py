@@ -22,7 +22,7 @@ class Seriouscon(object):
 				self.connected = True
 			print("[INFO] Established connection to serial port")
 		except Exception, e:
-			print("[ERROR] Unable to establish connection. %s" %e)
+			print("[ERROR] Unable to establish connection. %s"  % e)
 
 	def is_connected(self):
 		return self.connected
@@ -52,23 +52,26 @@ class Seriouscon(object):
 
 #for testing
 if __name__ == "__main__":
+        import time
 	sercon = Seriouscon()
-	sercon.listen()
-
-	if sercon.is_connected:
-		data = "ABC\n"
-		print("sending to serial")
-		sercon.send(data)
-                lol = 0
-		while lol < 10:
-                        
-			recv = sercon.receive()
-			print("Received %s" % recv)
-                        sercon.send(str(lol))
-                        lol += 1
+        try:
+                sercon.listen()
+                time.sleep(3)
+	        if sercon.is_connected():
+		        data = "ABC\n"
+		        print("sending to serial")
+		        sercon.send(data)
+                        lol = 0
+		        while lol < 10:                        
+			        recv = sercon.receive()
+			        print("Received %s" % recv)
+                                sercon.send(str(lol))
+                                lol += 1
+                        sercon.close()
+        except (KeyboardInterrupt, SystemExit):
                 sercon.close()
+                
 
 		
-	#arduino sends something
-	#so recv it
+
 	
