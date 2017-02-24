@@ -16,13 +16,11 @@ print("Serial Connection up")
 #establish bluetooth connection
 bToothCon = BTcon()
 bToothCon.listen()
-time.sleep(3)
 print("Bluetooth Connection Up")
 
 #establish wifi connection
 wifiCon = Tcpcon()
 wificon.listen()
-time.sleep(3)
 print("Wifi Connection Up")
 
 print("Connections up and running")
@@ -103,7 +101,7 @@ thread.start_new_thread(wifiReceive, ())
 thread.start_new_thread(btSend, ())
 thread.start_new_thread(btReceive, ())
 thread.start_new_thread(serialSend, ())
-thread.start_new_thread(serialRecieve, ())
+thread.start_new_thread(serialReceive, ())
 
 while True:
     time.sleep(1)
