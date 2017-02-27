@@ -1,4 +1,6 @@
-import thread #or just '_thread' for python3
+#import thread #or just '_thread' for python3
+from threading import Thread as thread
+import threading
 import time
 import serial #sudo pip/pip3 install pyserial
 
@@ -7,20 +9,23 @@ from serialcon import *
 from tcpcon import *
 from collections import deque
 
-#establish serial connection
-serialCon = Seriouscon()
-serialCon.listen()
-time.sleep(3)
-
-#establish bluetooth connection
-btCon = BTcon()
-btCon.listen()
-
-#establish wifi connection
-wifiCon = Tcpcon()
-wifiCon.listen()
-
-print("Connections running")
+class RPIThread(threading.Thread):
+    def __init__(self, function, name):
+        self.name = name
+        self.running = False
+        self.function = function
+        super(RPIThread, self).__init__()
+        
+    def start(self):
+        self.running = True
+        super(RPIThread, self).start()
+        
+    def run(self):
+        while self.running:
+            self.function()
+            
+    def stop(self):
+        self.running = False
 
 def serialReceive():
     #Incoming data from Arduino
@@ -73,6 +78,8 @@ def btReceive():
 def wifiSend():
     #Outgoing data to Algo
     while True:
+        
+        #TODO: send 2 blank messages to check if TCP Connection still alive
         time.sleep(0.5)
         if(len(wifiQueue) > 0):
             message = wifiQueue.popleft()
@@ -99,11 +106,50 @@ def wifiReceive():
             print("%s: Message From Wifi: %s" %(time.ctime(), tempBuffer))
         time.sleep(0.5)
 
+def setSerialCon():
+    #establish serial connection
+    serialCon = Seriouscon()
+    serialCon.listen()
+    time.sleep(3)
+    print("Serial Connection Up!")
 
+def setBTCon():
+    #establish bluetooth connection
+    btCon = BTcon()
+    btCon.listen()
+    time.sleep(1)
+    print("Bluetooth Connection Up!")
+
+def setWifiCon():
+    #establish wifi connection
+    wifiCon = Tcpcon()
+    wifiCon.listen()
+    time.sleep(1)
+    print("Wifi Connection Up!")
+    
+#Queues for messages     
 serialQueue = deque([])
 btQueue = deque([])
 wifiQueue = deque([])
 
+wifi-conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
+wifi-conThread.start()
+bt-conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+bt-conThread.start()
+serial-conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
+serial-conThread.start()
+print("Threading for connections up!")
+
+wifiSend-Thread = RPIThread(function = wifiSend, name='wifiSend')
+wifiSend-Thread.start()
+wifiReceive-Thread = RPIThread(function = wifiReceive, name='wifiReceive')
+wifiReceive-Thread.start()
+
+btSend-Thread = RPIThread(function = btSend, name='btSend')
+
+
+thread(name='wifiSend', target=wifiSend).start()
+thread(name='wifiReceive', target=wifiReceive).start() 
 thread.start_new_thread(wifiSend, ())
 thread.start_new_thread(wifiReceive, ())
 thread.start_new_thread(btSend, ())
@@ -112,5 +158,11 @@ thread.start_new_thread(serialSend, ())
 thread.start_new_thread(serialReceive, ())
 
 while True:
-    time.sleep(1)
-    pass
+    try:
+        if !('')
+        
+        
+        time.sleep(1)
+        pass
+    except KeyboardInterrupt:
+        #kill everything
