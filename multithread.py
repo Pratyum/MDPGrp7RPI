@@ -10,10 +10,11 @@ from collections import deque
 #establish serial connection
 serialCon = Seriouscon()
 serialCon.listen()
+time.sleep(3)
 
 #establish bluetooth connection
-bToothCon = BTcon()
-bToothCon.listen()
+btCon = BTcon()
+btCon.listen()
 
 #establish wifi connection
 wifiCon = Tcpcon()
@@ -26,15 +27,13 @@ def serialReceive():
     while True:
         tempBuffer = serialCon.receive()
         if (tempBuffer != ''):
-#            if (str(tempBuffer)[0] == 'e'):
-            btQueue.append(tempBuffer[1:])                
+            wifiQueue.append(tempBuffer[1:])                
             print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
-#            else:
-#                print("|Error - Serial Receive: " + tempBuffer)
             
         time.sleep(0.5)
 
 def serialSend():
+    #Outgoing Data to Arduino
     while True:
         time.sleep(0.5)
         if (len(serialQueue) > 0):
@@ -43,19 +42,21 @@ def serialSend():
             print("%s: Message to serial: %s" % (time.ctime(), message))
 
 def btSend():
+    #Outgoing Data to Android 
     while True:
         time.sleep(0.5)
         if( len(btQueue) > 0 ):
             message = btQueue.popleft()
-            bToothCon.send(message)
+            btCon.send(message)
             print("%s: Message to Bluetooth: %s" %(time.ctime(), message))
 
 def btReceive():
+    #Incoming Data from Android 
     while True:
-        tempBuffer = bToothCon.receive()
+        tempBuffer = btCon.receive()
         if(tempBuffer != ''):
             if (str(tempBuffer)[0] == 'c'):
-                #Send manual movement to robot
+                #Send manual movement to arduino
                 serialQueue.append(tempBuffer[1:])
             elif (str(tempBuffer)[0] == 'd'):
                 #Tell algo to start exploration/fastest path
@@ -67,6 +68,7 @@ def btReceive():
         time.sleep(0.5)
 
 def wifiSend():
+    #Outgoing data to Algo
     while True:
         time.sleep(0.5)
         if(len(wifiQueue) > 0):
@@ -75,6 +77,7 @@ def wifiSend():
             print("%s: Message to Wifi: %s" %(time.ctime(), message))
 
 def wifiReceive():
+    #Incoming data from Algo
     while True:
         tempBuffer = wifiCon.receive()
         if(tempBuffer != ''):
