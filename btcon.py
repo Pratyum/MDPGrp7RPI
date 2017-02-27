@@ -28,14 +28,18 @@ class BTcon(object):
 				self.connected = True
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
+                        self.close()
+                        self.listen()
 
 	def close(self):
 		if self.server_sock:
 			self.server_sock.close()
 			print("[INFO] Stopping BT listener.")
+                        self.connected = False
 		if self.client_sock:
 			self.client_sock.close()
 			print("[INFO] Closing client connection")
+                        self.connected = False
 
 	def receive(self):
 		try:
@@ -44,7 +48,8 @@ class BTcon(object):
 			return inst
 		except BluetoothError, be:
 			print "[ERROR]: Error receiving data from BLUETOOTH.", be
-			self.listen()
+                        self.close()
+                        self.listen()
 
 	def send(self, payload):
 		try:
@@ -52,6 +57,7 @@ class BTcon(object):
 		except BluetoothError, be:
 			print("[ERROR] Error sending to BLUETOOTH.")
 			print (be)
+                        self.close()
 			self.listen()
 
 

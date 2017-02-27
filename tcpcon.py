@@ -34,14 +34,18 @@ class Tcpcon(object):
 				self.connected = True
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
+                        self.close()
+                        self.listen()
 
 	def close(self):
 		if self.tcpip_sock: #listening
 			self.tcpip_sock.close()
 			print "[INFO]: Stopping tcpip listener"
+                        self.connected = False
 		if self.client_conn:
 			self.client_conn.close()
 			print "[INFO]: Closing client connection"
+                        self.connected = False
 
 	def receive(self):
 		"""
@@ -54,7 +58,8 @@ class Tcpcon(object):
 		except Exception, e:
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error receiving data from algo software."
-			self.connected = False
+                        self.close()
+                        self.listen()
 
 	def send(self, payload):
 		"""
@@ -62,9 +67,12 @@ class Tcpcon(object):
 		"""
 		try:
 			self.client_conn.sendto(payload, self.outbound_addr)
+                        print('sent')
 		except Exception, e:
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error sending."
+                        self.close()
+                        self.listen()
 
 
 if __name__=="__main__":
@@ -78,6 +86,8 @@ if __name__=="__main__":
 	                if payload:
 	            	        print payload.rstrip()
                                 tcpsk.send("feedback: " + payload)
+                        s = raw_input('->> ')
+                        tcpsk.send("from server: "+s)
         print("Closing connection")
         tcpsk.close()
 
