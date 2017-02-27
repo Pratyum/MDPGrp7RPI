@@ -1,7 +1,7 @@
 import socket
 import sys
 
-TCP_IP = "127.0.0.1" #change this
+TCP_IP = "0.0.0.0" #change this
 TCP_LISTEN_PORT = 13377
 BUFFER_SIZE = 512
 

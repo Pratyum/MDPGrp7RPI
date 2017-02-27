@@ -1,5 +1,5 @@
 from bluetooth import *
-
+import sys
 #ref: https://people.csail.mit.edu/albert/bluez-intro/x232.html
 
 BUFFER_SIZE = 512
@@ -29,7 +29,8 @@ class BTcon(object):
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
                         self.close()
-                        self.listen()
+                        #self.listen()
+                        sys.exit()
 
 	def close(self):
 		if self.server_sock:
@@ -49,7 +50,8 @@ class BTcon(object):
 		except BluetoothError, be:
 			print "[ERROR]: Error receiving data from BLUETOOTH.", be
                         self.close()
-                        self.listen()
+                        #self.listen()
+                        sys.exit()
 
 	def send(self, payload):
 		try:
@@ -58,7 +60,8 @@ class BTcon(object):
 			print("[ERROR] Error sending to BLUETOOTH.")
 			print (be)
                         self.close()
-			self.listen()
+			#self.listen()
+                        sys.exit()
 
 
 
