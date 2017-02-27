@@ -1,5 +1,5 @@
 import serial
-
+import sys
 #ref http://playground.arduino.cc/interfacing/python
 
 BAUD_RATE = 9600
@@ -23,7 +23,7 @@ class Seriouscon(object):
 			print("[INFO] Established connection to serial port")
 		except Exception, e:
 			print("[ERROR] Unable to establish connection. %s"  % e)
-                        self.listen()
+                        sys.exit()
 
 	def is_connected(self):
 		return self.connected
@@ -41,7 +41,7 @@ class Seriouscon(object):
 		except Exception, e:
 			print("[ERROR] Error receiving from arduino.")
                         self.close()
-                        self.listen()
+                        sys.exit()
 
 	def send(self, payload):
 		try:
@@ -53,7 +53,7 @@ class Seriouscon(object):
 			print("[ERROR] Error sending payload to Arduino.")
 			print(e)
                         self.close()
-                        self.listen()
+                        sys.exit()
 
 #for testing
 if __name__ == "__main__":

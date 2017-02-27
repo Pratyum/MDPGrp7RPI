@@ -35,7 +35,7 @@ class Tcpcon(object):
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
                         self.close()
-                        self.listen()
+                        sys.exit()
 
 	def close(self):
 		if self.tcpip_sock: #listening
@@ -59,7 +59,7 @@ class Tcpcon(object):
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error receiving data from algo software."
                         self.close()
-                        self.listen()
+                        sys.exit()
 
 	def send(self, payload):
 		"""
@@ -72,7 +72,7 @@ class Tcpcon(object):
 			print "[ERROR]: ", str(e)
 			print "[ERROR]: Error sending."
                         self.close()
-                        self.listen()
+                        sys.exit()
 
 
 if __name__=="__main__":
