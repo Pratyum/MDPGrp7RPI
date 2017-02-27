@@ -1,5 +1,3 @@
-#import thread #or just '_thread' for python3
-from threading import Thread as thread
 import threading
 import time
 import serial #sudo pip/pip3 install pyserial
@@ -11,7 +9,7 @@ from collections import deque
 
 class RPIThread(threading.Thread):
     def __init__(self, function, name):
-        self.name = name
+        self.threadName = name
         self.running = False
         self.function = function
         super(RPIThread, self).__init__()
@@ -27,6 +25,10 @@ class RPIThread(threading.Thread):
     def stop(self):
         self.running = False
 
+def mockFunction():
+    #Mock Function to create Dummy RPIThread object for comparison
+    pass
+
 def serialReceive():
     #Incoming data from Arduino
     while True:
@@ -40,6 +42,13 @@ def serialReceive():
 def serialSend():
     #Outgoing Data to Arduino
     while True:
+        try:
+            #check if connection still alive
+            serialCon.send("")
+        except Exception:
+            time.sleep(.5)
+            continue
+        
         time.sleep(0.5)
         if (len(serialQueue) > 0):
             message = serialQueue.popleft()
@@ -47,8 +56,15 @@ def serialSend():
             print("%s: Message to serial: %s" % (time.ctime(), message))
 
 def btSend():
-    #Outgoing Data to Android 
+    #Outgoing Data to Android
     while True:
+        try:
+            #check if connection still alive
+            btCon.send('')
+        except Exception:
+            time.sleep(.5)
+            continue
+        
         time.sleep(0.5)
         if( len(btQueue) > 0 ):
             message = btQueue.popleft()
@@ -78,8 +94,14 @@ def btReceive():
 def wifiSend():
     #Outgoing data to Algo
     while True:
+        try:
+            #TODO: send 2 blank messages to check if TCP Connection still alive
+            wifiCon.send('')
+            wifiCon.send('')
+        except Exception:
+            time.sleep(.5)
+            continue
         
-        #TODO: send 2 blank messages to check if TCP Connection still alive
         time.sleep(0.5)
         if(len(wifiQueue) > 0):
             message = wifiQueue.popleft()
@@ -132,6 +154,7 @@ serialQueue = deque([])
 btQueue = deque([])
 wifiQueue = deque([])
 
+
 wifi-conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
 wifi-conThread.start()
 bt-conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
@@ -140,29 +163,93 @@ serial-conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
 serial-conThread.start()
 print("Threading for connections up!")
 
-wifiSend-Thread = RPIThread(function = wifiSend, name='wifiSend')
+wifiSend-Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
 wifiSend-Thread.start()
-wifiReceive-Thread = RPIThread(function = wifiReceive, name='wifiReceive')
+wifiReceive-Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
 wifiReceive-Thread.start()
 
-btSend-Thread = RPIThread(function = btSend, name='btSend')
+btSend-Thread = RPIThread(function = btSend, name='btSend-Thread')
+btSend-Thread.start()
+btReceive-Thread = RPIThread(function = btReceive, name='btReceive-Thread')
+btReceive-Thread.start()
 
+serialSend-Thread = RPIThread(function = serialSend, name='serialSend-Thread')
+serialSend-Thread.start()
+serialReceive-Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
+serialReceive-Thread.start()
+print("Threadings for all components up!")
 
-thread(name='wifiSend', target=wifiSend).start()
-thread(name='wifiReceive', target=wifiReceive).start() 
-thread.start_new_thread(wifiSend, ())
-thread.start_new_thread(wifiReceive, ())
-thread.start_new_thread(btSend, ())
-thread.start_new_thread(btReceive, ())
-thread.start_new_thread(serialSend, ())
-thread.start_new_thread(serialReceive, ())
+dummyThread = RPIThread(function = mockFunction, name='test')
+totalCount = threading.activeCount()
+
 
 while True:
     try:
-        if !('')
+        if(threading.activeCount() != totalCount):
+            print("Some Thread Died, Checking...")
+
+            tempThreadList = []
+            for tempThread in threading.enumerate():
+                if (isinstance(tempThread, type(dummyThread))):
+                    tempThreadList.append(tempThread.threadName)
+
+            differenceList = list(set(threadList) - set(tempThreadList))
+            for i in differenceList:
+                if (i == 'wifi-conThread'):
+                    print("Wifi Connection Thread detected to be dead!")
+                    wifiSend-Thread.stop()
+                    wifiReceive-Thread.stop()
+                    print("wifiSend() & wifiReceive() Threads killed...")
+                    time.sleep(5)
+
+                    wifiSend-Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
+                    wifiSend-Thread.start()
+                    wifiReceive-Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
+                    wifiReceive-Thread.start()
+                    wifi-conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
+                    wifi-conThread.start()
+                    print("Wifi connections up")
+                    
+                elif( i == 'bt-conThread'):
+                    print("Bluetooth Connetion Thread detected to be dead!")
+                    btSend-Thread.stop()
+                    btReceive-Thread.stop()
+                    print("btSend() & btReceive() Threads killed...")
+                    time.sleep(5)
+
+                    btSend-Thread = RPIThread(function = btSend, name='btSend-Thread')
+                    btSend-Thread.start()
+                    btReceive-Thread = RPIThread(function = btReceive, name='btReceive-Thread')
+                    btReceive-Thread.start()
+                    bt-conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+                    bt-conThread.start()
+                    print("Bluetooth Connections up")
+
+                elif( i == "serial-conThread"):
+                    print("Serial Connection Thread detected to be dead!")
+                    serialSend-Thread.stop()
+                    serialReceive-Thread.stop()
+                    print("serialSend() & serialReceive() Threads killed...")
+                    time.sleep(5)
+                    
+                    serialSend-Thread = RPIThread(function = serialSend, name='serialSend-Thread')
+                    serialSend-Thread.start()
+                    serialReceive-Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
+                    serialReceive-Thread.start()
+                    serial-conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
+                    serial-conThread.start()
+                    print("Serial Connections up!")
         
         
         time.sleep(1)
         pass
+    
     except KeyboardInterrupt:
+        print("Killing threads...")
+        for i in threading.enumerate():
+            #Kill all RPIThread threads
+            if (isinstance(i, type(dummyThread))):
+                i.stop()
+        time.sleep(5)
+        print("Threads killed")
         #kill everything
