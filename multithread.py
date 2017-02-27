@@ -17,7 +17,7 @@ bToothCon.listen()
 
 #establish wifi connection
 wifiCon = Tcpcon()
-wificon.listen()
+wifiCon.listen()
 
 print("Connections running")
 
@@ -26,11 +26,11 @@ def serialReceive():
     while True:
         tempBuffer = serialCon.receive()
         if (tempBuffer != ''):
-            if (str(tempBuffer)[0] == 'e'):
-                btQueue.append(tempBuffer[1:])                
-                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
-            else:
-                print("|Error - Serial Receive: " + tempBuffer)
+#            if (str(tempBuffer)[0] == 'e'):
+            btQueue.append(tempBuffer[1:])                
+            print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+#            else:
+#                print("|Error - Serial Receive: " + tempBuffer)
             
         time.sleep(0.5)
 
@@ -100,7 +100,7 @@ thread.start_new_thread(wifiReceive, ())
 thread.start_new_thread(btSend, ())
 thread.start_new_thread(btReceive, ())
 thread.start_new_thread(serialSend, ())
-thread.start_new_thread(serialRecieve, ())
+thread.start_new_thread(serialReceive, ())
 
 while True:
     time.sleep(1)
