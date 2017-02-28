@@ -32,6 +32,7 @@ class Tcpcon(object):
 			print "[INFO]: connected on: ", self.outbound_addr
 			if self.client_conn:
 				self.connected = True
+                                self.send("ESTABED")
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
                         self.connected = False

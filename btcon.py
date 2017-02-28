@@ -26,6 +26,7 @@ class BTcon(object):
 			print "[BT INFO]: connected on: ", self.outbound_addr
 			if self.client_sock:
 				self.connected = True
+                                self.send("ESTABED")
 		except Exception, e:
 			print "[BT ERROR]: Can't establish connection.", str(e)
                         #self.listen()
