@@ -27,6 +27,7 @@ class RPIThread(threading.Thread):
             test = self.function()
             if (test == 2):
                 #if kill thread
+                print("GOT 2, KILLING" + self.threadName +"THREAD NOW")
                 self.running = False
             
     def stop(self):
@@ -40,10 +41,15 @@ def mockFunction():
 def serialReceive():
     #Incoming data from Arduino
     while True:
-        tempBuffer = serialCon.receive()
-        if (tempBuffer != ''):
-            wifiQueue.append(tempBuffer[1:])                
-            print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+        if (serialCon.is_connected()):
+            tempBuffer = serialCon.receive()
+            if (tempBuffer != ''):
+                wifiQueue.append(tempBuffer[1:])                
+                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+        else:
+            #serialConnection down, sleep and wait for something to happen
+            print("serialSend() detects serialCon down. ")
+            time.sleep(10)
             
         time.sleep(0.5)
 
@@ -64,8 +70,8 @@ def serialSend():
 def btSend():
     #Outgoing Data to Android
     while True:        
-        time.sleep(0.5)
-        if (btCon.is_connected()):
+        time.sleep(5)
+        if (btCon.is_connected() or btCon is not None):
             if( len(btQueue) > 0 ):
                 message = btQueue.popleft()
                 btCon.send(message)
@@ -77,22 +83,27 @@ def btSend():
 def btReceive():
     #Incoming Data from Android 
     while True:
-        tempBuffer = btCon.receive()
-        if(tempBuffer != ''):
-            if (str(tempBuffer)[0] == 'c'):
-                #Send manual movement to arduino
-                serialQueue.append(tempBuffer[1:])
-            elif (str(tempBuffer)[0] == 'd'):
-                #Tell algo to start exploration/fastest path
-                wifiQueue.append(tempBuffer[1:])
-            else:
-                try:
-                    print("| ERROR ERROR | BT RECEIVE: " + tempBuffer)
-                except Exception:
-                    pass
-                
-            print("%s: Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
-        time.sleep(0.5)
+        if (btCon.is_connected() or btCon is not None):
+            tempBuffer = btCon.receive()
+            if(tempBuffer != ''):
+                if (str(tempBuffer)[0] == 'c'):
+                    #Send manual movement to arduino
+                    serialQueue.append(tempBuffer[1:])
+                elif (str(tempBuffer)[0] == 'd'):
+                    #Tell algo to start exploration/fastest path
+                    wifiQueue.append(tempBuffer[1:])
+                else:
+                    try:
+                        print("| ERROR ERROR | BT RECEIVE: " + tempBuffer)
+                    except Exception:
+                        pass
+
+                print("%s: Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
+        else:
+            #serialConnection down, sleep and wait for something to happen
+            print("btReceive() detects btCon down. ")
+            time.sleep(10)
+        time.sleep(5)
 
 def wifiSend():
     #Outgoing data to Algo
@@ -119,21 +130,26 @@ def wifiSend():
 def wifiReceive():
     #Incoming data from Algo
     while True:
-        tempBuffer = wifiCon.receive()
-        if(tempBuffer != ''):
-            if(str(tempBuffer)[0] == 'a'):
-                #send to robot
-                serialQueue.append(tempBuffer[1:])
-            elif(str(tempBuffer)[0] == 'b'):
-                #send to android
-                btQueue.append(tempBuffer[1:])
-            else:
-                try:
-                    print("| ERROR ERROR | WIFI RECEIVE: " + tempBuffer)
-                except Exception:
-                    pass
-                
-            print("%s: Message From Wifi: %s" %(time.ctime(), tempBuffer))
+        if (wifiCon.is_connected()):
+            tempBuffer = wifiCon.receive()
+            if(tempBuffer != ''):
+                if(str(tempBuffer)[0] == 'a'):
+                    #send to robot
+                    serialQueue.append(tempBuffer[1:])
+                elif(str(tempBuffer)[0] == 'b'):
+                    #send to android
+                    btQueue.append(tempBuffer[1:])
+                else:
+                    try:
+                        print("| ERROR ERROR | WIFI RECEIVE: " + tempBuffer)
+                    except Exception:
+                        pass
+
+                print("%s: Message From Wifi: %s" %(time.ctime(), tempBuffer))
+        else:
+            #serialConnection down, sleep and wait for something to happen
+            print("wifiReceive() detects wifiCon down. ")
+            time.sleep(10)
         time.sleep(0.5)
 
 def setSerialCon():
@@ -264,14 +280,22 @@ try:
                     btReceive_Thread.stop()
                     print("btSend() & btReceive() Threads killed...")
                     time.sleep(5)
+                    
+                    btCon = None
+                    print("Resetting bt connection...")
+                    bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+                    bt_conThread.start()
+                    while(not btCon is not None and btCon.is_connected()):
+                        time.sleep(.5)
+                    print("Bluetooth Connections up")
 
                     btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
                     btSend_Thread.start()
+                    print("btSend up!")
                     btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
                     btReceive_Thread.start()
-                    bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
-                    bt_conThread.start()
-                    print("Bluetooth Connections up")
+                    print("btReceive up!")
+                    
 
                 if( i == "serial-conThread"):
                     print("Serial Connection Thread detected to be dead!")
@@ -280,13 +304,22 @@ try:
                     print("serialSend() & serialReceive() Threads killed...")
                     time.sleep(5)
 
-                    serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
-                    serialSend_Thread.start()
-                    serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
-                    serialReceive_Thread.start()
+                    serialCon = None 
+                    
+                    print('Resetting serial connection...')
                     serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
                     serial_conThread.start()
+                    while(not serialCon is not NOne and seiralCon.is_connected()):
+                        time.sleep(.5)
                     print("Serial Connections up!")
+                    
+                    serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
+                    serialSend_Thread.start()
+                    print("serialSend up!")
+                    serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
+                    serialReceive_Thread.start()
+                    print("serialReceive up!")
+                    
 
         time.sleep(1)
         continue
