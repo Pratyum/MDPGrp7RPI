@@ -134,24 +134,33 @@ def wifiReceive():
 
 def setSerialCon():
     #establish serial connection
-    serialCon = Seriouscon()
-    serialCon.listen()
-    time.sleep(3)
-    print("Serial Connection Up!")
+    if(isinstance(serialCon, None)):
+        serialCon = Seriouscon()
+        serialCon.listen()
+        time.sleep(3)
+        print("Serial Connection Up!")
+    else:
+        time.sleep(50)
 
 def setBTCon():
     #establish bluetooth connection
-    btCon = BTcon()
-    btCon.listen()
-    time.sleep(1)
-    print("Bluetooth Connection Up!")
+    if(isinstance(btCon, None)):
+        btCon = BTcon()
+        btCon.listen()
+        time.sleep(1)
+        print("Bluetooth Connection Up!")
+    else:
+        time.sleep(50)
 
 def setWifiCon():
     #establish wifi connection
-    wifiCon = Tcpcon()
-    wifiCon.listen()
-    time.sleep(1)
-    print("Wifi Connection Up!")
+    if(isinstance(wifiCon, None)):
+        wifiCon = Tcpcon()
+        wifiCon.listen()
+        time.sleep(1)
+        print("Wifi Connection Up!")
+    else: 
+        time.sleep(50)
     
 #Queues for messages     
 serialQueue = deque([])
