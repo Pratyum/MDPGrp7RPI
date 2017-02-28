@@ -213,75 +213,74 @@ try:
     totalCount = threading.activeCount()
 
     while True:
-        try:
-            if(threading.activeCount() != totalCount):
-                print("Some Thread Died, Checking...")
+    if(threading.activeCount() != totalCount):
+        print("Some Thread Died, Checking...")
 
-                tempThreadList = []
-                for tempThread in threading.enumerate():
-                    if (isinstance(tempThread, type(dummyThread))):
-                        tempThreadList.append(tempThread.threadName)
+        tempThreadList = []
+        for tempThread in threading.enumerate():
+            if (isinstance(tempThread, type(dummyThread))):
+                tempThreadList.append(tempThread.threadName)
 
-                differenceList = list(set(threadList) - set(tempThreadList))
-                for i in differenceList:
-                    if (i == 'wifi-conThread'):
-                        print("Wifi Connection Thread detected to be dead!")
-                        wifiSend_Thread.stop()
-                        wifiReceive_Thread.stop()
-                        print("wifiSend() & wifiReceive() Threads killed...")
-                        time.sleep(5)
+        differenceList = list(set(threadList) - set(tempThreadList))
+        for i in differenceList:
+            if (i == 'wifi-conThread'):
+                print("Wifi Connection Thread detected to be dead!")
+                wifiSend_Thread.stop()
+                wifiReceive_Thread.stop()
+                print("wifiSend() & wifiReceive() Threads killed...")
+                time.sleep(5)
 
-                        wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
-                        wifiSend_Thread.start()
-                        wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
-                        wifiReceive_Thread.start()
-                        wifi_conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
-                        wifi_conThread.start()
-                        print("Wifi connections up")
+                wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
+                wifiSend_Thread.start()
+                wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
+                wifiReceive_Thread.start()
+                wifi_conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
+                wifi_conThread.start()
+                print("Wifi connections up")
 
-                    if( i == 'bt-conThread'):
-                        print("Bluetooth Connetion Thread detected to be dead!")
-                        btSend_Thread.stop()
-                        btReceive_Thread.stop()
-                        print("btSend() & btReceive() Threads killed...")
-                        time.sleep(5)
+            if( i == 'bt-conThread'):
+                print("Bluetooth Connetion Thread detected to be dead!")
+                btSend_Thread.stop()
+                btReceive_Thread.stop()
+                print("btSend() & btReceive() Threads killed...")
+                time.sleep(5)
 
-                        btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
-                        btSend_Thread.start()
-                        btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
-                        btReceive_Thread.start()
-                        bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
-                        bt_conThread.start()
-                        print("Bluetooth Connections up")
+                btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
+                btSend_Thread.start()
+                btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
+                btReceive_Thread.start()
+                bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+                bt_conThread.start()
+                print("Bluetooth Connections up")
 
-                    if( i == "serial-conThread"):
-                        print("Serial Connection Thread detected to be dead!")
-                        serialSend_Thread.stop()
-                        serialReceive_Thread.stop()
-                        print("serialSend() & serialReceive() Threads killed...")
-                        time.sleep(5)
+            if( i == "serial-conThread"):
+                print("Serial Connection Thread detected to be dead!")
+                serialSend_Thread.stop()
+                serialReceive_Thread.stop()
+                print("serialSend() & serialReceive() Threads killed...")
+                time.sleep(5)
 
-                        serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
-                        serialSend_Thread.start()
-                        serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
-                        serialReceive_Thread.start()
-                        serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
-                        serial_conThread.start()
-                        print("Serial Connections up!")
+                serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
+                serialSend_Thread.start()
+                serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
+                serialReceive_Thread.start()
+                serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
+                serial_conThread.start()
+                print("Serial Connections up!")
 
 
-            time.sleep(1)
-            pass
+        time.sleep(1)
+        continue
     
 except KeyboardInterrupt:
     print("Threads left: \n" + str(threading.enumerate()))
     print("Killing threads...")
     for i in threading.enumerate():
         #Kill all RPIThread threads
-        if (isinstance(i, type(dummyThread))):
+        if i is type(dummyThread):
             print(i.threadName + " thread is killed")
             i.stop()
     time.sleep(5)
-    print("Threads left: \n" + str(threading.enumerate())
+    print("Threads left: \n" + str(threading.enumerate()))
     print("Threads killed")
     #kill everything
