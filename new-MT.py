@@ -49,35 +49,30 @@ def serialReceive():
 
 def serialSend():
     #Outgoing Data to Arduino
-    while True:
-        try:
-            #check if connection still alive
-            serialCon.send("")
-        except Exception:
-            time.sleep(.5)
-            continue
-        
+    while True:        
         time.sleep(0.5)
-        if (len(serialQueue) > 0):
-            message = serialQueue.popleft()
-            serialCon.send(message)
-            print("%s: Message to serial: %s" % (time.ctime(), message))
+        if (serialCon.is_connected()):
+            if (len(serialQueue) > 0):
+                message = serialQueue.popleft()
+                serialCon.send(message)
+                print("%s: Message to serial: %s" % (time.ctime(), message))
+        else:
+            #serialConnection down, sleep and wait for something to happen
+            print("serialSend() detects serialCon down. ")
+            time.sleep(10)
 
 def btSend():
     #Outgoing Data to Android
-    while True:
-        try:
-            #check if connection still alive
-            btCon.send('')
-        except Exception:
-            time.sleep(.5)
-            continue
-        
+    while True:        
         time.sleep(0.5)
-        if( len(btQueue) > 0 ):
-            message = btQueue.popleft()
-            btCon.send(message)
-            print("%s: Message to Bluetooth: %s" %(time.ctime(), message))
+        if (btCon.is_connected()):
+            if( len(btQueue) > 0 ):
+                message = btQueue.popleft()
+                btCon.send(message)
+                print("%s: Message to Bluetooth: %s" %(time.ctime(), message))
+        else:
+            print("btSend() detected btCon down. ")
+            time.sleep(10)
 
 def btReceive():
     #Incoming Data from Android 
@@ -241,13 +236,22 @@ try:
                     print("wifiSend() & wifiReceive() Threads killed...")
                     time.sleep(5)
 
-                    wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
-                    wifiSend_Thread.start()
-                    wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
-                    wifiReceive_Thread.start()
+                    wifiCon = None
+                    
+                    print("resetting wifi connection...")
                     wifi_conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
                     wifi_conThread.start()
-                    print("Wifi connections up")
+                    while (not wifiCon is not None and wifiCon.is_connected()):
+                        time.sleep(.5)
+                    
+                    print("wifiCon up")
+                    
+                    wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
+                    wifiSend_Thread.start()
+                    print("wifiSend up")
+                    wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
+                    wifiReceive_Thread.start()
+                    print("wifiReceive up")
 
                 if( i == 'bt-conThread'):
                     print("Bluetooth Connetion Thread detected to be dead!")
@@ -278,7 +282,6 @@ try:
                     serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
                     serial_conThread.start()
                     print("Serial Connections up!")
-
 
         time.sleep(1)
         continue
