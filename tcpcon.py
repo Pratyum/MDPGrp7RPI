@@ -25,27 +25,27 @@ class Tcpcon(object):
 			self.tcpip_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.tcpip_sock.bind((self.listen_addr, self.listen_port))
 			self.tcpip_sock.listen(1)
-			print("[INFO]: TCPIP Socket Listening.\n")
+			print("[TCP INFO]: TCPIP Socket Listening.\n")
 			#listening, accept incoming connections
 			self.client_conn, self.outbound_addr = self.tcpip_sock.accept()
-			print "[INFO]: connected to: ", str(self.client_conn)
-			print "[INFO]: connected on: ", self.outbound_addr
+			print "[TCP INFO]: connected to: ", str(self.client_conn)
+			print "[TCP INFO]: connected on: ", self.outbound_addr
 			if self.client_conn:
 				self.connected = True
                                 self.send("ESTABED")
 		except Exception, e:
-			print "[ERROR]: Can't establish connection.", str(e)
+			print "[TCP ERROR]: Can't establish connection.", str(e)
                         self.connected = False
                         return self.close()
 
 	def close(self):
 		if self.tcpip_sock: #listening
 			self.tcpip_sock.close()
-			print "[INFO]: Stopping tcpip listener"
+			print "[TCP TCP INFO]: Stopping tcpip listener"
                         self.connected = False
 		if self.client_conn:
 			self.client_conn.close()
-			print "[INFO]: Closing client connection"
+			print "[TCP INFO]: Closing client connection"
                         self.connected = False
                 return 2
         
@@ -58,8 +58,8 @@ class Tcpcon(object):
 			inst = self.client_conn.recv(BUFFER_SIZE)
 			return inst
 		except Exception, e:
-			print ("[ERROR]: %s " % str(e))
-			print "[ERROR]: Error receiving data from algo software."
+			print ("[TCP ERROR]: %s " % str(e))
+			print "[TCP ERROR]: Error receiving data from algo software."
                         self.connected = False
                         return self.close()
 
@@ -69,10 +69,10 @@ class Tcpcon(object):
 		"""
 		try:
 			self.client_conn.sendto(payload, self.outbound_addr)
-                        print('sent')
+                        print('[TCP INFO]sent')
 		except Exception, e:
-			print ("[ERROR]: %s" % str(e))
-			print ("[ERROR]: Error sending.")
+			print ("[TCP ERROR]: %s" % str(e))
+			print ("[TCP ERROR]: Error sending.")
                         self.connected = False
                         return self.close()
 
