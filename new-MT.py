@@ -24,10 +24,14 @@ class RPIThread(threading.Thread):
         
     def run(self):
         while self.running:
-            self.function()
+            test = self.function()
+            if (test == 2):
+                #if kill thread
+                self.running = False
             
     def stop(self):
         self.running = False
+        
 
 def mockFunction():
     #Mock Function to create Dummy RPIThread object for comparison
@@ -178,7 +182,6 @@ try:
     bt_conThread.start()
     serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
     serial_conThread.start()
-    print("Threading for connections up!")
 
     connectionThreadCounter = 0 #connection thread counter must be three to signify that all three connections are up 
 
@@ -186,22 +189,28 @@ try:
         if wifi_conThread is not None and wifiCon.is_connected():
             wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
             wifiSend_Thread.start()
+            print('Wifi Send Started')
             wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
             wifiReceive_Thread.start()
+            print('Wifi receive started')
             connectionThreadCounter += 1
 
         if bt_conThread is not None and btCon.is_connected():
             btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
             btSend_Thread.start()
+            print("bt send Started")
             btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
             btReceive_Thread.start()
+            print("bt receive Started")
             connectionThreadCounter += 1
 
         if serial_conThread is not None and serialCon.is_connected():
             serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
             serialSend_Thread.start()
+            print('serial send started')
             serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
             serialReceive_Thread.start()
+            print("serial receive started")
             connectionThreadCounter += 1
 
     while(threading.activeCount() != 11):
@@ -209,7 +218,8 @@ try:
         time.sleep(.5)
         continue
 
-    print("Threadings for all components up!")
+    time.sleep(5)
+    print("Threadings for all components up! Thread Count: " + threading.activeCount())
 
     totalCount = threading.activeCount()
 
@@ -278,7 +288,7 @@ except KeyboardInterrupt:
     print("Killing threads...")
     for i in threading.enumerate():
         #Kill all RPIThread threads
-        if i is type(dummyThread):
+        if i is type(dummyThread): 
             print(i.threadName + " thread is killed")
             i.stop()
     time.sleep(5)
