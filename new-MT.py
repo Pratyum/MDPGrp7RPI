@@ -167,25 +167,40 @@ serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
 serial_conThread.start()
 print("Threading for connections up!")
 
-wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
-wifiSend_Thread.start()
-wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
-wifiReceive_Thread.start()
+connectionThreadCounter = 0 #connection thread counter must be three to signify that all three connections are up 
 
-btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
-btSend_Thread.start()
-btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
-btReceive_Thread.start()
+while (connectionThreadCounter != 3):
+    if(!isinstance(wifi_conThread, None)):
+        wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
+        wifiSend_Thread.start()
+        wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
+        wifiReceive_Thread.start()
+        connectionThreadCounter += 1
+        
+    if (!isinstance(bt_conThread, None)):
+        btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
+        btSend_Thread.start()
+        btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
+        btReceive_Thread.start()
+        connectionThreadCounter += 1
 
-serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
-serialSend_Thread.start()
-serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
-serialReceive_Thread.start()
+    if (!isinstance(serial_conThread, None)):
+        serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
+        serialSend_Thread.start()
+        serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
+        serialReceive_Thread.start()
+        connectionThreadCounter += 1
+        
 print("Threadings for all components up!")
+
+while(threading.activeCount() != 11):
+    #Check to ensure that pre-determined number of threads (9) + 2 main threads are up before starting 
+    time.sleep(.5)
+    continue
+    
 
 dummyThread = RPIThread(function = mockFunction, name='test')
 totalCount = threading.activeCount()
-
 
 while True:
     try:
