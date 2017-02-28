@@ -20,51 +20,50 @@ class BTcon(object):
 			self.server_sock = BluetoothSocket( RFCOMM )
 			self.server_sock.bind( ("",self.channel) )
 			self.server_sock.listen(1)
-			print ("[INFO]: Bluetooth listening on channel %d" % self.channel)
+			print ("[BT INFO]: Bluetooth listening on channel %d" % self.channel)
 			self.client_sock, self.outbound_addr = self.server_sock.accept() 
-			print "[INFO]: connected to: ", str(self.client_sock)
-			print "[INFO]: connected on: ", self.outbound_addr
+			print "[BT INFO]: connected to: ", str(self.client_sock)
+			print "[BT INFO]: connected on: ", self.outbound_addr
 			if self.client_sock:
 				self.connected = True
 		except Exception, e:
-			print "[ERROR]: Can't establish connection.", str(e)
-                        self.close()
+			print "[BT ERROR]: Can't establish connection.", str(e)
                         #self.listen()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 	def close(self):
 		if self.server_sock:
 			self.server_sock.close()
-			print("[INFO] Stopping BT listener.")
+			print("[BT INFO] Stopping BT listener.")
                         self.connected = False
 		if self.client_sock:
 			self.client_sock.close()
-			print("[INFO] Closing client connection")
+			print("[BT INFO] Closing client connection")
                         self.connected = False
-
+                return 2
+        
 	def receive(self):
 		try:
 			inst = self.client_sock.recv(BUFFER_SIZE)
-			print "[INFO]: Received: ", inst
+			print "[BT INFO]: Received: ", inst
 			return inst
 		except BluetoothError, be:
-			print "[ERROR]: Error receiving data from BLUETOOTH.", be
-                        self.close()
+			print "[BT ERROR]: Error receiving data from BLUETOOTH.", be
                         #self.listen()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 	def send(self, payload):
 		try:
 			self.client_sock.send(payload)
+                        print ("[BT INFO] Sent: %s"% payload)
 		except BluetoothError, be:
-			print("[ERROR] Error sending to BLUETOOTH.")
+			print("[BT ERROR] Error sending to BLUETOOTH.")
 			print (be)
-                        self.close()
 			#self.listen()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 
 

@@ -34,9 +34,8 @@ class Tcpcon(object):
 				self.connected = True
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
-                        self.close()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 	def close(self):
 		if self.tcpip_sock: #listening
@@ -47,7 +46,8 @@ class Tcpcon(object):
 			self.client_conn.close()
 			print "[INFO]: Closing client connection"
                         self.connected = False
-
+                return 2
+        
 	def receive(self):
 		"""
 		Receive message from algo software
@@ -59,9 +59,8 @@ class Tcpcon(object):
 		except Exception, e:
 			print ("[ERROR]: %s " % str(e))
 			print "[ERROR]: Error receiving data from algo software."
-                        self.close()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 	def send(self, payload):
 		"""
@@ -73,9 +72,8 @@ class Tcpcon(object):
 		except Exception, e:
 			print ("[ERROR]: %s" % str(e))
 			print ("[ERROR]: Error sending.")
-                        self.close()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 
 if __name__=="__main__":

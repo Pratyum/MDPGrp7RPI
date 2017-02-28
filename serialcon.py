@@ -17,14 +17,15 @@ class Seriouscon(object):
 		Establish serial connection
 		"""
 		try:
+                        print("[SER INFO] SER Listening")
 			self.serial_conn = serial.Serial(self.serial_port, self.baud_rate, timeout = 2)
 			if self.serial_conn:
 				self.connected = True
-			print("[INFO] Established connection to serial port")
+			print("[SER INFO] Established connection to serial port")
 		except Exception, e:
-			print("[ERROR] Unable to establish connection. %s"  % e)
+			print("[SER ERROR] Unable to establish connection. %s"  % e)
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 	def is_connected(self):
 		return self.connected
@@ -33,30 +34,30 @@ class Seriouscon(object):
 		if self.serial_conn:
 			self.serial_conn.close()
 			self.connected = False
-			print("[INFO] Connection to serial port closed.")
+			print("[SER INFO] Connection to serial port closed.")
+                return 2
 
 	def receive(self):
 		try:
 			data = self.serial_conn.readline()
+                        print("[SER INFO] SER Recv %s " % str(data) )
 			return data
 		except Exception, e:
-			print("[ERROR] Error receiving from arduino.")
-                        self.close()
+			print("[SER ERROR] Error receiving from arduino.")
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 	def send(self, payload):
 		try:
 			#might need to convert string to bytes
 			payload = payload.encode('utf-8')
 			self.serial_conn.write(payload)
-
+                        print("[SER INFO] Sent %s " % str(payload))
 		except Exception, e:
-			print("[ERROR] Error sending payload to Arduino.")
+			print("[SER ERROR] Error sending payload to Arduino.")
 			print(e)
-                        self.close()
                         self.connected = False
-                        sys.exit()
+                        return self.close()
 
 #for testing
 if __name__ == "__main__":
