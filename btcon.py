@@ -30,6 +30,7 @@ class BTcon(object):
 			print "[ERROR]: Can't establish connection.", str(e)
                         self.close()
                         #self.listen()
+                        self.connected = False
                         sys.exit()
 
 	def close(self):
@@ -51,6 +52,7 @@ class BTcon(object):
 			print "[ERROR]: Error receiving data from BLUETOOTH.", be
                         self.close()
                         #self.listen()
+                        self.connected = False
                         sys.exit()
 
 	def send(self, payload):
@@ -61,6 +63,7 @@ class BTcon(object):
 			print (be)
                         self.close()
 			#self.listen()
+                        self.connected = False
                         sys.exit()
 
 

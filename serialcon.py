@@ -23,6 +23,7 @@ class Seriouscon(object):
 			print("[INFO] Established connection to serial port")
 		except Exception, e:
 			print("[ERROR] Unable to establish connection. %s"  % e)
+                        self.connected = False
                         sys.exit()
 
 	def is_connected(self):
@@ -41,6 +42,7 @@ class Seriouscon(object):
 		except Exception, e:
 			print("[ERROR] Error receiving from arduino.")
                         self.close()
+                        self.connected = False
                         sys.exit()
 
 	def send(self, payload):
@@ -53,6 +55,7 @@ class Seriouscon(object):
 			print("[ERROR] Error sending payload to Arduino.")
 			print(e)
                         self.close()
+                        self.connected = False
                         sys.exit()
 
 #for testing

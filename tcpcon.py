@@ -35,6 +35,7 @@ class Tcpcon(object):
 		except Exception, e:
 			print "[ERROR]: Can't establish connection.", str(e)
                         self.close()
+                        self.connected = False
                         sys.exit()
 
 	def close(self):
@@ -56,9 +57,10 @@ class Tcpcon(object):
 			inst = self.client_conn.recv(BUFFER_SIZE)
 			return inst
 		except Exception, e:
-			print "[ERROR]: ", str(e)
+			print ("[ERROR]: %s " % str(e))
 			print "[ERROR]: Error receiving data from algo software."
                         self.close()
+                        self.connected = False
                         sys.exit()
 
 	def send(self, payload):
@@ -69,9 +71,10 @@ class Tcpcon(object):
 			self.client_conn.sendto(payload, self.outbound_addr)
                         print('sent')
 		except Exception, e:
-			print "[ERROR]: ", str(e)
-			print "[ERROR]: Error sending."
+			print ("[ERROR]: %s" % str(e))
+			print ("[ERROR]: Error sending.")
                         self.close()
+                        self.connected = False
                         sys.exit()
 
 
