@@ -102,7 +102,12 @@ def wifiSend():
             wifiCon.send('')
             wifiCon.send('')
         except Exception:
-            time.sleep(.5)
+            wifi_conThread.stop()
+            print("No of active threads running: " + threading.activeCount())
+            print("Detected that TCP cannot send, stopping thread now")
+            time.sleep(1)
+            print("Thread stopped")
+            print("No of active threads running: " + threading.activeCount())
             continue
         
         time.sleep(0.5)
