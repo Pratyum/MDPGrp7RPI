@@ -44,6 +44,9 @@ def serialReceive():
         if (serialCon.is_connected()):
             tempBuffer = serialCon.receive()
             if (tempBuffer != ''):
+                if tempBuffer == 2:
+                    return 2
+                
                 wifiQueue.append(tempBuffer[1:])                
                 print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
         else:
@@ -60,7 +63,10 @@ def serialSend():
         if (serialCon.is_connected()):
             if (len(serialQueue) > 0):
                 message = serialQueue.popleft()
-                serialCon.send(message)
+                temp = serialCon.send(message)
+                if temp == 2:
+                    return 2
+                
                 print("%s: Message to serial: %s" % (time.ctime(), message))
         else:
             #serialConnection down, sleep and wait for something to happen
@@ -74,7 +80,10 @@ def btSend():
         if (btCon.is_connected() or btCon is not None):
             if( len(btQueue) > 0 ):
                 message = btQueue.popleft()
-                btCon.send(message)
+                temp = btCon.send(message)
+                if temp == 2: 
+                    return 2
+                
                 print("%s: Message to Bluetooth: %s" %(time.ctime(), message))
         else:
             print("btSend() detected btCon down. ")
@@ -85,7 +94,11 @@ def btReceive():
     while True:
         if (btCon.is_connected() or btCon is not None):
             tempBuffer = btCon.receive()
+            
             if(tempBuffer != ''):
+                if tempBuffer == 2:
+                    return 2
+                
                 if (str(tempBuffer)[0] == 'c'):
                     #Send manual movement to arduino
                     serialQueue.append(tempBuffer[1:])
@@ -133,6 +146,9 @@ def wifiReceive():
         if (wifiCon.is_connected()):
             tempBuffer = wifiCon.receive()
             if(tempBuffer != ''):
+                if tempBuffer == 2:
+                    return 2
+                
                 if(str(tempBuffer)[0] == 'a'):
                     #send to robot
                     serialQueue.append(tempBuffer[1:])
