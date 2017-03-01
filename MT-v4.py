@@ -159,10 +159,6 @@ def serialReceive():
     #Incoming data from Arduino
     if serialCon is not None:
         if (serialCon.is_connected()):
-            if not serialCon.receive():
-                time.sleep(0.5)
-                return
-            
             tempBuffer = serialCon.receive()
             
             wifiQueue.append(tempBuffer[1:])                
@@ -365,5 +361,8 @@ try:
         continue
 
 except KeyboardInterrupt:    
+    btCon.close()
+    wifiCon.close()
+    serialCon.close()
     print("Threads killed")
 
