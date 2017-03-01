@@ -9,7 +9,14 @@ from collections import deque
 wifiCon = None
 btCon = None
 serialCon = None
+conCheck = None
 
+class globalCheck():
+    def __init__(self):
+        self.bt = False
+        self.wifi = False
+        self.serial = False
+        
 class RPIThread(threading.Thread):
     def __init__(self, function, name):
         self.threadName = name
@@ -38,13 +45,19 @@ def mockFunction():
 
 def btSend():
     #Outgoing Data to Android
+    if (conCheck.bt is False):
+        print("btSend(): Detected btCon down. ")
+        print("btSend(): Sleep 15 Seconds and wait")
+        time.sleep(15)
+        
     time.sleep(1)
     if (btCon.is_connected() or btCon is not None):
         if( len(btQueue) > 0 ):
             message = btQueue.popleft()
             temp = btCon.send(message)
             if temp == 2: 
-                return 2
+                conCheck.bt = False
+                return
 
             print("%s - btSend(): Message to Bluetooth: %s" %(time.ctime(), message))
     else:
@@ -54,12 +67,18 @@ def btSend():
 
 def btReceive():
     #Incoming Data from Android 
+    if (conCheck.bt is False):
+        print("btReceive(): Detected btCon down. ")
+        print("btReceive(): Sleep 15 Seconds and wait")
+        time.sleep(15)
+        
     if (btCon.is_connected() or btCon is not None):
         tempBuffer = btCon.receive()
 
         if(tempBuffer != ''):
             if tempBuffer == 2:
-                return 2
+                conCheck.bt = False
+                return
 
             if (str(tempBuffer)[0] == 'c'):
                 #Send manual movement to arduino
@@ -93,6 +112,7 @@ def setBTCon():
     else:
         time.sleep(50)      
         
+conCheck = globalCheck()        
 dummyThread = RPIThread(function = mockFunction, name='test')
 
 try:
@@ -121,6 +141,8 @@ try:
                 btReceive_Thread.daemon = True
                 btReceive_Thread.start()
                 print("bt receive Started")
+                conCheck.bt = True
+                print("conCheck.bt is true")
                 connectionThreadCounter += 1
                 print("connectionThreadCounter count: " + str(connectionThreadCounter))
         
@@ -130,7 +152,60 @@ try:
     totalCount = threading.activeCount()
     
     while True:
-        if(threading.activeCount() != totalCount):
+        if(conCheck.bt is False):
+            print("Bluetooth Connetion Thread detected to be dead!")
+            bt_conThread.stop()
+            btSend_Thread.stop()
+            btReceive_Thread.stop()
+            print("BT Threads killed")
+            time.sleep(3)
+            
+            btCon = None
+            print("Resetting bt connection...")
+            bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+            bt_conThread.daemon = True
+            bt_conThread.start()
+            while(btCon is None):
+                time.sleep(.1)
+            while (not btCon.is_connected()):
+                time.sleep(.1)
+            
+            print("Bluetooth Connections up")
+
+            btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
+            btSend_Thread.daemon = True
+            btSend_Thread.start()
+            print("btSend up!")
+            btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
+            btReceive_Thread.daemon = True
+            btReceive_Thread.start()
+            print("btReceive up!")
+            conCheck.bt = True
+            
+        
+
+        time.sleep(3)
+        continue
+
+except KeyboardInterrupt:    
+    print("Threads left: \n" + str(threading.enumerate()))
+    print("Killing threads...")
+#    for i in threading.enumerate():
+#        #Kill all RPIThread threads
+#        if i is type(dummyThread): 
+#            print(i.threadName + " thread is killed")
+#            i.stop()
+#    time.sleep(5)
+    print("Threads left: \n" + str(threading.enumerate()))
+    print("Threads killed")
+    #kill everything
+
+
+
+    
+    
+    '''
+    if(threading.activeCount() != totalCount):
             print("Some Thread Died, Checking...")
             print("totalCount = " + str(totalCount) + ", currentCount = " + str(threading.activeCount()))
             print(threading.enumerate())
@@ -143,7 +218,7 @@ try:
             print("threadList :" + str(threadList))
             print("tempThreadList: " + str(tempThreadList))
             differenceList = list(set(threadList) - set(tempThreadList))
-            print("differenceList: " + list(set(threadList) - set(tempThreadList)))
+            print("differenceList: " + str(list(set(threadList) - set(tempThreadList))))
             for i in differenceList:
                 print("Into the for loop!")
                 if( i == 'bt-conThread'):
@@ -167,22 +242,6 @@ try:
                     btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
                     btReceive_Thread.start()
                     print("btReceive up!")
-
-        time.sleep(3)
-        continue
-
-except KeyboardInterrupt:    
-    print("Threads left: \n" + str(threading.enumerate()))
-    print("Killing threads...")
-#    for i in threading.enumerate():
-#        #Kill all RPIThread threads
-#        if i is type(dummyThread): 
-#            print(i.threadName + " thread is killed")
-#            i.stop()
-#    time.sleep(5)
-    print("Threads left: \n" + str(threading.enumerate()))
-    print("Threads killed")
-    #kill everything
-
-
-
+    
+    
+    '''
