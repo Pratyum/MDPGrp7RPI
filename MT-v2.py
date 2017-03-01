@@ -111,15 +111,15 @@ try:
     while(connectionThreadCounter != 1):
         if bt_conThread is not None:
             if (btCon.is_connected()):
-            btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
-            btSend_Thread.daemon = True
-            btSend_Thread.start()
-            print("bt send Started")
-            btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
-            btReceive_Thread.daemon = True
-            btReceive_Thread.start()
-            print("bt receive Started")
-            connectionThreadCounter += 1
+                btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
+                btSend_Thread.daemon = True
+                btSend_Thread.start()
+                print("bt send Started")
+                btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
+                btReceive_Thread.daemon = True
+                btReceive_Thread.start()
+                print("bt receive Started")
+                connectionThreadCounter += 1
             
     while (threading.activeCount() != 5):
         #Check to ensure that pre-determined number of threads (9) + 2 main threads are up before starting 
