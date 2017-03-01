@@ -109,7 +109,8 @@ try:
     connectionThreadCounter = 0 #connection thread counter must be three to signify that all three connections are up 
     
     while(connectionThreadCounter != 1):
-        if bt_conThread is not None and btCon.is_connected():
+        if bt_conThread is not None:
+            if (btCon.is_connected()):
             btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
             btSend_Thread.daemon = True
             btSend_Thread.start()
