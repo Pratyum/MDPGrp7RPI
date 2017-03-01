@@ -38,7 +38,7 @@ def mockFunction():
 
 def btSend():
     #Outgoing Data to Android
-    time.sleep(5)
+    time.sleep(1)
     if (btCon.is_connected() or btCon is not None):
         if( len(btQueue) > 0 ):
             message = btQueue.popleft()
@@ -67,6 +67,8 @@ def btReceive():
             elif (str(tempBuffer)[0] == 'd'):
                 #Tell algo to start exploration/fastest path
                 wifiQueue.append(tempBuffer[1:])
+            elif (str(tempBuffer)[0] == 'z'):
+                btQueue.append(tempBuffer[1:])
             else:
                 try:
                     print("| ERROR ERROR | BT RECEIVE: " + tempBuffer)
@@ -79,7 +81,7 @@ def btReceive():
         print("btReceive(): Detects btCon down. ")
         print("btReceive(): Sleep 15 Seconds and wait")
         time.sleep(15)
-    time.sleep(5)
+    time.sleep(1)
         
 def setBTCon():
     #establish bluetooth connection
@@ -109,7 +111,7 @@ try:
     connectionThreadCounter = 0 #connection thread counter must be three to signify that all three connections are up 
     
     while(connectionThreadCounter != 1):
-        if bt_conThread is not None:
+        if btCon is not None:
             if (btCon.is_connected()):
                 btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
                 btSend_Thread.daemon = True
@@ -120,17 +122,14 @@ try:
                 btReceive_Thread.start()
                 print("bt receive Started")
                 connectionThreadCounter += 1
-            
-    while (threading.activeCount() != 5):
-        #Check to ensure that pre-determined number of threads (9) + 2 main threads are up before starting 
-        time.sleep(.5)
-        continue
+                print("connectionThreadCounter count: " + connectionThreadCounter)
+        
 
+    time.sleep(.5)
     print("Threadings for all components up! Thread Count: " + threading.activeCount())
     totalCount = threading.activeCount()
     
     while True:
-
         if(threading.activeCount() != totalCount):
             print("Some Thread Died, Checking...")
 
