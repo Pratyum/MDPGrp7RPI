@@ -122,25 +122,30 @@ try:
                 btReceive_Thread.start()
                 print("bt receive Started")
                 connectionThreadCounter += 1
-                print("connectionThreadCounter count: " + connectionThreadCounter)
+                print("connectionThreadCounter count: " + str(connectionThreadCounter))
         
 
     time.sleep(.5)
-    print("Threadings for all components up! Thread Count: " + threading.activeCount())
+    print("Threadings for all components up! Thread Count: " + str(threading.activeCount()))
     totalCount = threading.activeCount()
     
     while True:
         if(threading.activeCount() != totalCount):
             print("Some Thread Died, Checking...")
+            print("totalCount = " + str(totalCount) + ", currentCount = " + str(threading.activeCount()))
+            print(threading.enumerate())
 
             tempThreadList = []
             for tempThread in threading.enumerate():
                 if (isinstance(tempThread, type(dummyThread))):
                     tempThreadList.append(tempThread.threadName)
 
+            print("threadList :" + str(threadList))
+            print("tempThreadList: " + str(tempThreadList))
             differenceList = list(set(threadList) - set(tempThreadList))
+            print("differenceList: " + list(set(threadList) - set(tempThreadList)))
             for i in differenceList:
-
+                print("Into the for loop!")
                 if( i == 'bt-conThread'):
                     print("Bluetooth Connetion Thread detected to be dead!")
                     btSend_Thread.stop()
@@ -163,7 +168,7 @@ try:
                     btReceive_Thread.start()
                     print("btReceive up!")
 
-        time.sleep(1)
+        time.sleep(3)
         continue
 
 except KeyboardInterrupt:    
