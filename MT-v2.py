@@ -140,29 +140,6 @@ try:
 
             differenceList = list(set(threadList) - set(tempThreadList))
             for i in differenceList:
-                if (i == 'wifi-conThread'):
-                    print("Wifi Connection Thread detected to be dead!")
-                    wifiSend_Thread.stop()
-                    wifiReceive_Thread.stop()
-                    print("wifiSend() & wifiReceive() Threads killed...")
-                    time.sleep(5)
-
-                    wifiCon = None
-                    
-                    print("resetting wifi connection...")
-                    wifi_conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
-                    wifi_conThread.start()
-                    while (not wifiCon is not None and wifiCon.is_connected()):
-                        time.sleep(.5)
-                    
-                    print("wifiCon up")
-                    
-                    wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
-                    wifiSend_Thread.start()
-                    print("wifiSend up")
-                    wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
-                    wifiReceive_Thread.start()
-                    print("wifiReceive up")
 
                 if( i == 'bt-conThread'):
                     print("Bluetooth Connetion Thread detected to be dead!")
@@ -185,31 +162,6 @@ try:
                     btReceive_Thread = RPIThread(function = btReceive, name='btReceive-Thread')
                     btReceive_Thread.start()
                     print("btReceive up!")
-                    
-
-                if( i == "serial-conThread"):
-                    print("Serial Connection Thread detected to be dead!")
-                    serialSend_Thread.stop()
-                    serialReceive_Thread.stop()
-                    print("serialSend() & serialReceive() Threads killed...")
-                    time.sleep(5)
-
-                    serialCon = None 
-                    
-                    print('Resetting serial connection...')
-                    serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
-                    serial_conThread.start()
-                    while(not serialCon is not NOne and seiralCon.is_connected()):
-                        time.sleep(.5)
-                    print("Serial Connections up!")
-                    
-                    serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
-                    serialSend_Thread.start()
-                    print("serialSend up!")
-                    serialReceive_Thread = RPIThread(function = serialReceive, name='serialReceive-Thread')
-                    serialReceive_Thread.start()
-                    print("serialReceive up!")
-                    
 
         time.sleep(1)
         continue
