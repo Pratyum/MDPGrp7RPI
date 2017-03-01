@@ -15,7 +15,7 @@ class globalCheck():
     def __init__(self):
         self.bt = False
         self.wifi = False
-        #self.serial = False #Not used for now 
+        self.serial = False #Not used for now 
         
 class RPIThread(threading.Thread):
     def __init__(self, function, name):
@@ -243,7 +243,7 @@ try:
     
     while(connectionThreadCounter != 3):
         if serial_conThread is not None:
-            if serialCon.is_connected():
+            if serialCon.is_connected() and conCheck.serial is False:
                 serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
                 serialSend_Thread.daemon = True
                 serialSend_Thread.start()
@@ -254,10 +254,11 @@ try:
                 serialReceive_Thread.start()
                 print("serial receive started")
             
+                conCheck.serial = True
                 connectionThreadCounter += 1
             
         if wifiCon is not None:
-            if (wifiCon.is_connected()):
+            if (wifiCon.is_connected() and conCheck.wifi is False):
                 
                 wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
                 wifiSend_Thread.daemon = True
@@ -273,7 +274,7 @@ try:
                 connectionThreadCounter += 1
             
         if btCon is not None:
-            if (btCon.is_connected()):
+            if (btCon.is_connected() and conCheck.bt is False):
                 btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
                 btSend_Thread.daemon = True
                 btSend_Thread.start()
