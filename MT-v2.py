@@ -43,6 +43,7 @@ def mockFunction():
     #Mock Function to create Dummy RPIThread object for comparison
     pass
 
+
 def btSend():
     #Outgoing Data to Android
     if (conCheck.bt is False):
@@ -50,20 +51,23 @@ def btSend():
         print("btSend(): Sleep 15 Seconds and wait")
         time.sleep(15)
         
-    time.sleep(1)
-    if (btCon.is_connected() or btCon is not None):
-        if( len(btQueue) > 0 ):
-            message = btQueue.popleft()
-            temp = btCon.send(message)
-            if temp == 2: 
-                conCheck.bt = False
-                return
+    time.sleep(.5)
+    if (btCon is not None):
+        if btCon.is_connected():
+            if( len(btQueue) > 0 ):
+                message = btQueue.popleft()
+                temp = btCon.send(message)
+                if temp == 2: 
+                    conCheck.bt = False
+                    return
 
-            print("%s - btSend(): Message to Bluetooth: %s" %(time.ctime(), message))
+                print("%s - btSend(): Message to Bluetooth: %s" %(time.ctime(), message))
     else:
         print("btSend(): Detected btCon down. ")
         print("btSend(): Sleep 15 Seconds and wait")
         time.sleep(15)
+        
+
 
 def btReceive():
     #Incoming Data from Android 
@@ -72,35 +76,36 @@ def btReceive():
         print("btReceive(): Sleep 15 Seconds and wait")
         time.sleep(15)
         
-    if (btCon.is_connected() or btCon is not None):
-        tempBuffer = btCon.receive()
+    if (btCon is not None):
+        if btCon.is_connected():
+            tempBuffer = btCon.receive()
 
-        if(tempBuffer != ''):
-            if tempBuffer == 2:
-                conCheck.bt = False
-                return
+            if(tempBuffer != ''):
+                if tempBuffer == 2:
+                    conCheck.bt = False
+                    return
 
-            if (str(tempBuffer)[0] == 'c'):
-                #Send manual movement to arduino
-                serialQueue.append(tempBuffer[1:])
-            elif (str(tempBuffer)[0] == 'd'):
-                #Tell algo to start exploration/fastest path
-                wifiQueue.append(tempBuffer[1:])
-            elif (str(tempBuffer)[0] == 'z'):
-                btQueue.append(tempBuffer[1:])
-            else:
-                try:
-                    print("| ERROR ERROR | BT RECEIVE: " + tempBuffer)
-                except Exception:
-                    pass
+                if (str(tempBuffer)[0] == 'c'):
+                    #Send manual movement to arduino
+                    serialQueue.append(tempBuffer[1:])
+                elif (str(tempBuffer)[0] == 'd'):
+                    #Tell algo to start exploration/fastest path
+                    wifiQueue.append(tempBuffer[1:])
+                elif (str(tempBuffer)[0] == 'z'):
+                    btQueue.append(tempBuffer[1:])
+                else:
+                    try:
+                        print("| ERROR ERROR | BT RECEIVE: " + tempBuffer)
+                    except Exception:
+                        pass
 
-            print("%s - btReceive(): Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
+                print("%s - btReceive(): Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
     else:
         #serialConnection down, sleep and wait for something to happen
         print("btReceive(): Detects btCon down. ")
         print("btReceive(): Sleep 15 Seconds and wait")
         time.sleep(15)
-    time.sleep(1)
+    time.sleep(.5)
         
 def setBTCon():
     #establish bluetooth connection
@@ -112,6 +117,7 @@ def setBTCon():
     else:
         time.sleep(50)      
         
+
 conCheck = globalCheck()        
 dummyThread = RPIThread(function = mockFunction, name='test')
 
@@ -120,9 +126,7 @@ try:
     serialQueue = deque([])
     btQueue = deque([])
     wifiQueue = deque([])
-    
-    threadList = ['bt-conThread', 'btSend-Thread', 'btReceive-Thread']
-    
+        
     #Bluetooth is thread 2
     bt_conThread = RPIThread(function = setBTCon, name = 'bt-conThread')
     bt_conThread.daemon = True
@@ -181,9 +185,38 @@ try:
             btReceive_Thread.start()
             print("btReceive up!")
             conCheck.bt = True
-            
         
-
+        if (conCheck.wifi is False):
+            print("Wifi Connection Thread detected to be dead!")
+            wifi_conThread.stop()
+            wifiSend_Thread.stop()
+            wifiReceive_Thread.stop()
+            print("Wifi Threads Killed")
+            time.sleep(3)
+            
+            wifiCon = None
+            print("Resetting wifi connection...")
+            wifi_conThread = RPIThread(function = setWifiCon(), name = 'wifi-conThread')
+            wifi_conThread.daemon = True
+            wifi_conThread.start()
+            
+            while wifiCon is None:
+                time.sleep(.1)
+            while not wifiCon.isConnect():
+                time.sleep(.1)
+                
+            print("Wifi Connctions Up")
+            
+            wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
+            wifiSend_Thread.daemon = True
+            wifiSend_Thread.start()
+            print('Wifi Send Started')
+            wifiReceive_Thread = RPIThread(function = wifiReceive, name='wifiReceive-Thread')
+            wifiReceive_Thread.daemon = True
+            wifiReceive_Thread.start()
+            print('Wifi receive started')
+            conCheck.wifi = True
+            
         time.sleep(3)
         continue
 
