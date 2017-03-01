@@ -40,6 +40,8 @@ class Seriouscon(object):
 	def receive(self):
 		try:
 			data = self.serial_conn.readline()
+                        if not data:
+                                return
                         print("[SER INFO] SER Recv %s " % str(data) )
 			return data
 		except Exception, e:
