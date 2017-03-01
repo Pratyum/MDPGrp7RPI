@@ -159,8 +159,12 @@ def serialReceive():
     #Incoming data from Arduino
     if serialCon is not None:
         if (serialCon.is_connected()):
+            if not serialCon.receive():
+                time.sleep(0.5)
+                return
+            
             tempBuffer = serialCon.receive()
-
+            
             wifiQueue.append(tempBuffer[1:])                
             print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
         else:
@@ -244,6 +248,8 @@ try:
     while(connectionThreadCounter != 3):
         if serial_conThread is not None:
             if serialCon.is_connected() and conCheck.serial is False:
+                conCheck.serial = True
+                
                 serialSend_Thread = RPIThread(function = serialSend, name='serialSend-Thread')
                 serialSend_Thread.daemon = True
                 serialSend_Thread.start()
@@ -254,11 +260,11 @@ try:
                 serialReceive_Thread.start()
                 print("serial receive started")
             
-                conCheck.serial = True
                 connectionThreadCounter += 1
             
         if wifiCon is not None:
             if (wifiCon.is_connected() and conCheck.wifi is False):
+                conCheck.wifi = True
                 
                 wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
                 wifiSend_Thread.daemon = True
@@ -270,11 +276,12 @@ try:
                 wifiReceive_Thread.start()
                 print('Wifi receive started')
                 
-                conCheck.wifi = True
                 connectionThreadCounter += 1
             
         if btCon is not None:
             if (btCon.is_connected() and conCheck.bt is False):
+                conCheck.bt = True    
+                
                 btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
                 btSend_Thread.daemon = True
                 btSend_Thread.start()
@@ -285,7 +292,6 @@ try:
                 btReceive_Thread.start()
                 print("bt receive Started")
                 
-                conCheck.bt = True    
                 connectionThreadCounter += 1
             
     time.sleep(.5)
@@ -303,7 +309,7 @@ try:
             
             wifiCon = None
             print("Resetting wifi connection...")
-            wifi_conThread = RPIThread(function = setWifiCon(), name = 'wifi-conThread')
+            wifi_conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
             wifi_conThread.daemon = True
             wifi_conThread.start()
             
@@ -313,6 +319,7 @@ try:
                 time.sleep(.1)
                 
             print("Wifi Connctions Up")
+            conCheck.wifi = True
             
             wifiSend_Thread = RPIThread(function = wifiSend, name='wifiSend-Thread')
             wifiSend_Thread.daemon = True
@@ -322,7 +329,7 @@ try:
             wifiReceive_Thread.daemon = True
             wifiReceive_Thread.start()
             print('Wifi receive started')
-            conCheck.wifi = True
+            
             
         if(conCheck.bt is False):
             print("Bluetooth Connetion Thread detected to be dead!")
@@ -334,7 +341,7 @@ try:
             
             btCon = None
             print("Resetting bt connection...")
-            bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+            bt_conThread = RPIThread(function = setBTCon, name = 'bt-conThread')
             bt_conThread.daemon = True
             bt_conThread.start()
             while(btCon is None):
@@ -343,7 +350,8 @@ try:
                 time.sleep(.1)
             
             print("Bluetooth Connections up")
-
+            conCheck.bt = True
+            
             btSend_Thread = RPIThread(function = btSend, name='btSend-Thread')
             btSend_Thread.daemon = True
             btSend_Thread.start()
@@ -352,7 +360,6 @@ try:
             btReceive_Thread.daemon = True
             btReceive_Thread.start()
             print("btReceive up!")
-            conCheck.bt = True
             
         time.sleep(3)
         continue
