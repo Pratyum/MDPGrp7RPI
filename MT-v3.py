@@ -77,12 +77,13 @@ def wifiSend():
         print("wifiSend(): Sleep 15 Seconds and wait")
         time.sleep(15)
         
-    try: 
-        wifiCon.send('')
-        wifiCon.send('')
-    except Exception:
+    wifiCon.send('')
+    temp = wifiCon.send('')
+    if temp == 2:
         conCheck.wifi = False
+        time.sleep(15)
         return
+    
     
     time.sleep(.5)
     if (wifiCon is not None):
