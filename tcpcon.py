@@ -56,7 +56,10 @@ class Tcpcon(object):
 
 		try:
 			inst = self.client_conn.recv(BUFFER_SIZE)
-			return inst
+                        if inst:
+			        return inst
+                        else:
+                                raise AttributeError('Connection broke or empty recv payload.')
 		except Exception, e:
 			print ("[TCP ERROR]: %s " % str(e))
 			print "[TCP ERROR]: Error receiving data from algo software."
