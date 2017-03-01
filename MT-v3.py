@@ -161,7 +161,7 @@ try:
             
             while wifiCon is None:
                 time.sleep(.1)
-            while not wifiCon.isConnect():
+            while not wifiCon.is_connected():
                 time.sleep(.1)
                 
             print("Wifi Connctions Up")
