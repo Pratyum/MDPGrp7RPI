@@ -50,7 +50,7 @@ class Seriouscon(object):
 	def send(self, payload):
 		try:
 			#might need to convert string to bytes
-			payload = payload.encode('utf-8')
+			payload = payload.rstrip().encode('utf-8')
 			self.serial_conn.write(payload)
                         print("[SER INFO] Sent %s " % str(payload))
 		except Exception, e:
