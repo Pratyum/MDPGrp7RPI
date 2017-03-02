@@ -80,7 +80,7 @@ def wifiSend():
             conCheck.wifi = False
             time.sleep(15)
             return
-    except Exception e:
+    except Exception, e:
         print("wifiSend() Exception: " + str(e))
         conCheck.wifi = False
         time.sleep(15)
