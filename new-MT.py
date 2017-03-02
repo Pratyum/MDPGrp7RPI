@@ -210,7 +210,7 @@ try:
 
     wifi_conThread = RPIThread(function = setWifiCon, name = 'wifi-conThread')
     wifi_conThread.start()
-    bt_conThread = RPIThread(function = setBTCon(), name = 'bt-conThread')
+    bt_conThread = RPIThread(function = setBTCon, name = 'bt-conThread')
     bt_conThread.start()
     serial_conThread = RPIThread(function = setSerialCon, name = 'serial-conThread')
     serial_conThread.start()
