@@ -23,6 +23,7 @@ class Tcpcon(object):
 		"""
 		try:
 			self.tcpip_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        self.tcpip_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			self.tcpip_sock.bind((self.listen_addr, self.listen_port))
 			self.tcpip_sock.listen(1)
 			print("[TCP INFO]: TCPIP Socket Listening.\n")
