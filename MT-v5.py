@@ -179,7 +179,7 @@ def serialTransmit():
                 if (serialCon.is_connected()):
                     tempBuffer = serialCon.receive()
 
-                    wifiQueue.append(tempBuffer[1:])                
+                    wifiQueue.append(tempBuffer)                
                     print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
                 else:
                     #serialConnection down, sleep and wait for something to happen
