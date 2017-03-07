@@ -73,7 +73,7 @@ class Tcpcon(object):
 		"""
 		try:
 			self.client_conn.sendto(payload, self.outbound_addr)
-                        print('[TCP INFO]sent')
+                        #print('[TCP INFO]sent')
 		except Exception, e:
 			print ("[TCP ERROR]: %s" % str(e))
 			print ("[TCP ERROR]: Error sending.")
