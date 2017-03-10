@@ -212,7 +212,7 @@ def setBTCon():
     if btCon is None:
         btCon = ANDcon()
         btCon.listen()
-        print("setBTCon(): Bluetooth Connection Up!")
+        print("setBTCon(): Android Connection Up!")
     else:
         time.sleep(50)      
         

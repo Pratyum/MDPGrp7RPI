@@ -24,29 +24,29 @@ class ANDcon(object):
 		try:
 			self.tcpip_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         self.tcpip_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-			self.tcpip_sock.bind((self.listen_addr, self.listen_port))
+                        self.tcpip_sock.bind((self.listen_addr, self.listen_port))
 			self.tcpip_sock.listen(1)
 			print("[TCP INFO]: TCPIP Socket Listening.\n")
 			#listening, accept incoming connections
 			self.client_conn, self.outbound_addr = self.tcpip_sock.accept()
-			print "[TCP INFO]: connected to: ", str(self.client_conn)
-			print "[TCP INFO]: connected on: ", self.outbound_addr
+			print ("[TCP INFO]: connected to: %s" % str(self.client_conn))
+			print ("[TCP INFO]: connected on: %s" % self.outbound_addr)
 			if self.client_conn:
 				self.connected = True
                                 self.send("ESTABED")
 		except Exception, e:
-			print "[TCP ERROR]: Can't establish connection.", str(e)
+			print ("[TCP ERROR]: Can't establish connection. %s" % str(e))
                         self.connected = False
                         return self.close()
 
 	def close(self):
 		if self.tcpip_sock: #listening
 			self.tcpip_sock.close()
-			print "[TCP TCP INFO]: Stopping tcpip listener"
+			print ("[TCP TCP INFO]: Stopping tcpip listener")
                         self.connected = False
 		if self.client_conn:
 			self.client_conn.close()
-			print "[TCP INFO]: Closing client connection"
+			print ("[TCP INFO]: Closing client connection")
                         self.connected = False
                 return 2
         
@@ -63,7 +63,7 @@ class ANDcon(object):
                                 raise AttributeError('Connection broke or empty recv payload.')
 		except Exception, e:
 			print ("[TCP ERROR]: %s " % str(e))
-			print "[TCP ERROR]: Error receiving data from algo software."
+			print ("[TCP ERROR]: Error receiving data from algo software.")
                         self.connected = False
                         return self.close()
 
@@ -82,18 +82,22 @@ class ANDcon(object):
 
 
 if __name__=="__main__":
-	tcpsk = Tcpcon()
+	tcpsk = ANDcon()
 	tcpsk.listen()
+        print("Listening on port: %s" % str(TCP_LISTEN_PORT))
 	if tcpsk.is_connected():
-                print "Connected."
-	        print "recving"
+                print( "Connected.")
+	        print("recving")
                 while tcpsk.is_connected():
                         payload = tcpsk.receive()
 	                if payload:
 	            	        print payload.rstrip()
                                 tcpsk.send("feedback: " + payload)
-                        s = raw_input('->> ')
-                        tcpsk.send("from server: "+s)
+                                if payload == "exit":
+                                        tcpsk.close()
+                                        sys.exit()
+                        s = input('->> ').rstrip()
+                        tcpsk.send(s)
         print("Closing connection")
         tcpsk.close()
 
