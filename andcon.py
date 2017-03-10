@@ -1,7 +1,7 @@
 import socket
 import sys
 
-TCP_IP = "0.0.0.0" #change this
+TCP_IP = "127.0.0.1" #change this
 TCP_LISTEN_PORT = 13388
 BUFFER_SIZE = 512
 
@@ -30,7 +30,7 @@ class ANDcon(object):
 			#listening, accept incoming connections
 			self.client_conn, self.outbound_addr = self.tcpip_sock.accept()
 			print ("[TCP INFO]: connected to: %s" % str(self.client_conn))
-			print ("[TCP INFO]: connected on: %s" % self.outbound_addr)
+			print ("[TCP INFO]: connected on: " , self.outbound_addr)
 			if self.client_conn:
 				self.connected = True
                                 self.send("ESTABED")
@@ -91,12 +91,9 @@ if __name__=="__main__":
                 while tcpsk.is_connected():
                         payload = tcpsk.receive()
 	                if payload:
-	            	        print payload.rstrip()
-                                tcpsk.send("feedback: " + payload)
-                                if payload == "exit":
-                                        tcpsk.close()
-                                        sys.exit()
-                        s = input('->> ').rstrip()
+	            	        print("feedback: "+ payload.rstrip())
+                                #tcpsk.send(payload)
+                        s = raw_input('->> ').rstrip()
                         tcpsk.send(s)
         print("Closing connection")
         tcpsk.close()
