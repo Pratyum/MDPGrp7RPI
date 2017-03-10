@@ -63,8 +63,8 @@ def wifiReceive():
                 except Exception:
                     pass
 
-            print("%s: Message From Wifi: %s" %(time.ctime(), tempBuffer))        
-    time.sleep(.05)        
+#            print("%s: Message From Wifi: %s" %(time.ctime(), tempBuffer))        
+#    time.sleep(.05)        
         
 def wifiSend():
     #Outgoing Data to Algo
@@ -87,14 +87,14 @@ def wifiSend():
         return
     
     
-    time.sleep(.05)
+#    time.sleep(.05)
     if (wifiCon is not None):
         if wifiCon.is_connected():
             if( len(wifiQueue) > 0 ):
                 message = wifiQueue.popleft()
                 temp = wifiCon.send(message)
 
-                print("%s - wifiSend(): Message to Algo: %s" %(time.ctime(), message))
+#                print("%s - wifiSend(): Message to Algo: %s" %(time.ctime(), message))
     else:
         print("wifiSend(): Detected wifiCon down. ")
         print("wifiSend(): Sleep 15 Seconds and wait")
@@ -107,7 +107,7 @@ def btSend():
         print("btSend(): Sleep 15 Seconds and wait")
         time.sleep(15)
         
-    time.sleep(.05)
+#    time.sleep(.05)
     if (btCon is not None):
         if btCon.is_connected():
             if( len(btQueue) > 0 ):
@@ -117,7 +117,7 @@ def btSend():
                     conCheck.bt = False
                     return
 
-                print("%s - btSend(): Message to Bluetooth: %s" %(time.ctime(), message))
+#                print("%s - btSend(): Message to Bluetooth: %s" %(time.ctime(), message))
     else:
         print("btSend(): Detected btCon down. ")
         print("btSend(): Sleep 15 Seconds and wait")
@@ -153,26 +153,26 @@ def btReceive():
                     except Exception:
                         pass
 
-                print("%s - btReceive(): Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
+#                print("%s - btReceive(): Message from Bluetooth: %s" %(time.ctime(), tempBuffer))
     else:
         #serialConnection down, sleep and wait for something to happen
         print("btReceive(): Detects btCon down. ")
         print("btReceive(): Sleep 15 Seconds and wait")
         time.sleep(15)
-    time.sleep(.05)
+#    time.sleep(.05)
         
 
 
 def serialTransmit():
     #Outgoing Data to Arduino
-    time.sleep(0.05)
+#    time.sleep(0.05)
     if serialCon is not None:
         if (serialCon.is_connected()):
             if (len(serialQueue) > 0):
                 message = serialQueue.popleft()
                 serialCon.send(message)
 
-                print("%s: Message to serial: %s" % (time.ctime(), message))
+#                print("%s: Message to serial: %s" % (time.ctime(), message))
                 
                 ###
                 #Incoming data from Arduino
@@ -180,7 +180,7 @@ def serialTransmit():
             print('tempBuffer from Serial: ' + str(tempBuffer))
             if (tempBuffer is not '' or tempBuffer is not None or len(tempBuffer) != 0):
                 wifiQueue.append(tempBuffer)                
-                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+#                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
         
         else:
             #serialConnection down, sleep and wait for something to happen
@@ -337,9 +337,9 @@ try:
             bt_conThread.daemon = True
             bt_conThread.start()
             while(btCon is None):
-                time.sleep(.1)
+                time.sleep(5)
             while (not btCon.is_connected()):
-                time.sleep(.1)
+                time.sleep(5)
             
             print("Bluetooth Connections up")
             conCheck.bt = True
