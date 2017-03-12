@@ -36,7 +36,7 @@ class Tcpcon(object):
                 self.send("ESTABED")
         except Exception, e:
             print "[TCP ERROR]: Can't establish connection.", str(e)
-            self.connected = False
+            #self.connected = False
             return self.close()
 
     def close(self):
@@ -48,7 +48,7 @@ class Tcpcon(object):
             self.client_conn.close()
             print "[TCP INFO]: Closing client connection"
             self.connected = False
-            return 2
+        return 2
         
     def receive(self):
         """
@@ -64,7 +64,7 @@ class Tcpcon(object):
         except Exception, e:
             print ("[TCP ERROR]: %s " % str(e))
             print "[TCP ERROR]: Error receiving data from algo software."
-            self.connected = False
+            #self.connected = False
             return self.close()
 
     def send(self, payload):
@@ -77,7 +77,7 @@ class Tcpcon(object):
         except Exception, e:
             print ("[TCP ERROR]: %s" % str(e))
             print ("[TCP ERROR]: Error sending.")
-            self.connected = False
+            #self.connected = False
             return self.close()
 
 
