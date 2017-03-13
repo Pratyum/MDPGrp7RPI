@@ -72,7 +72,7 @@ class ANDcon(object):
         Send msg to algo software
         """
         try:
-            self.client_conn.send(payload)
+            self.client_conn.send(payload+"\n")
             #print('[TCP INFO]sent')
         except Exception, e:
             print ("[TCP ERROR]: %s" % str(e))
