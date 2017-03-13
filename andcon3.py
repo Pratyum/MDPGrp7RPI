@@ -2,10 +2,10 @@ import socket
 import sys
 
 TCP_IP = "0.0.0.0" #change this
-TCP_LISTEN_PORT = 13377
+TCP_LISTEN_PORT = 13388
 BUFFER_SIZE = 512
 
-class Tcpcon(object):
+class ANDcon(object):
     def __init__(self):
         self.listen_addr = TCP_IP
         self.listen_port = TCP_LISTEN_PORT
@@ -29,24 +29,24 @@ class Tcpcon(object):
             print("[TCP INFO]: TCPIP Socket Listening.\n")
             #listening, accept incoming connections
             self.client_conn, self.outbound_addr = self.tcpip_sock.accept()
-            print "[TCP INFO]: connected to: ", str(self.client_conn)
-            print "[TCP INFO]: connected on: ", self.outbound_addr
+            print ("[TCP INFO]: connected to: %s" % str(self.client_conn))
+            print ("[TCP INFO]: connected on: " , self.outbound_addr)
             if self.client_conn:
                 self.connected = True
                 self.send("ESTABED")
-        except Exception, e:
-            print "[TCP ERROR]: Can't establish connection.", str(e)
+        except Exception as e:
+            print ("[TCP ERROR]: Can't establish connection. %s" % str(e))
             #self.connected = False
             return self.close()
 
     def close(self):
         if self.tcpip_sock: #listening
             self.tcpip_sock.close()
-            print "[TCP TCP INFO]: Stopping tcpip listener"
+            print ("[TCP TCP INFO]: Stopping tcpip listener")
             self.connected = False
         if self.client_conn:
             self.client_conn.close()
-            print "[TCP INFO]: Closing client connection"
+            print ("[TCP INFO]: Closing client connection")
             self.connected = False
         return 2
         
@@ -56,14 +56,14 @@ class Tcpcon(object):
         """
 
         try:
-            inst = self.client_conn.recv(BUFFER_SIZE)
+            inst = self.client_conn.recv(BUFFER_SIZE).decode()
             if inst:
                 return inst
             else:
                 raise AttributeError('Connection broke or empty recv payload.')
-        except Exception, e:
+        except Exception as e:
             print ("[TCP ERROR]: %s " % str(e))
-            print "[TCP ERROR]: Error receiving data from algo software."
+            print ("[TCP ERROR]: Error receiving data from algo software.")
             #self.connected = False
             return self.close()
 
@@ -72,9 +72,9 @@ class Tcpcon(object):
         Send msg to algo software
         """
         try:
-            self.client_conn.send(payload)
-                        #print('[TCP INFO]sent')
-        except Exception, e:
+            self.client_conn.send(str(payload).encode())
+            #print('[TCP INFO]sent')
+        except Exception as e:
             print ("[TCP ERROR]: %s" % str(e))
             print ("[TCP ERROR]: Error sending.")
             #self.connected = False
@@ -82,18 +82,19 @@ class Tcpcon(object):
 
 
 if __name__=="__main__":
-    tcpsk = Tcpcon()
+    tcpsk = ANDcon()
     tcpsk.listen()
+    print("Listening on port: %s" % str(TCP_LISTEN_PORT))
     if tcpsk.is_connected():
-        print "Connected."
-        print "recving"
+        print( "Connected.")
+        print("recving")
         while tcpsk.is_connected():
             payload = tcpsk.receive()
             if payload:
-                print payload.rstrip()
-                tcpsk.send("feedback: " + payload)
-            s = raw_input('->> ')
-            tcpsk.send("from server: "+s)
+                print("feedback: "+ payload.rstrip())
+                #tcpsk.send(payload)
+            s = input('->> ')
+            tcpsk.send(s)
     print("Closing connection")
     tcpsk.close()
 
