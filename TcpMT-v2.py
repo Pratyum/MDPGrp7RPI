@@ -42,6 +42,17 @@ def algoRead():
             print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer)) 
 
         elif (str(tempBuffer)[0] == 'b'):
+<<<<<<< .mine
+            checkIndex = tempBuffer.find('|')
+            if checkIndex == -1:
+                andQueue.append(tempBuffer[1:])
+            elif tempBuffer[checkIndex+1] == 'a':
+                andQueue.append(tempBuffer[1:checkIndex+1])
+                serialQueue.append(tempBuffer[checkIndex+2:])
+                print("############### Detected and Split! ############")
+                
+            print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))       
+=======
             checkIndex = tempBuffer.find('|')
             if tempBuffer[checkIndex+1] == 'a':
                 andQueue.append(tempBuffer[1:checkIndex+1])
@@ -53,6 +64,7 @@ def algoRead():
 	    else:
 	        andQueue.append(tempBuffer[1:])
 		print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
+>>>>>>> .r107
         
         elif (tempBuffer == 2):
             raise AttributeError("HI")
