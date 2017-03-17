@@ -42,6 +42,7 @@ def algoRead():
             print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer)) 
 
         elif (str(tempBuffer)[0] == 'b'):
+<<<<<<< HEAD
             checkIndex = tempBuffer.find('|')
             if tempBuffer[checkIndex+1] == 'a':
                 andQueue.append(tempBuffer[1:checkIndex+1])
@@ -53,18 +54,26 @@ def algoRead():
 	    else:
 	        andQueue.append(tempBuffer[1:])
 		print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
+=======
+            andQueue.append(tempBuffer[1:])
+            print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))       
+>>>>>>> 35517bc3292d0e8b956035f8b42a38dc825c1f36
         
         elif (tempBuffer == 2):
             raise AttributeError("HI")
         else:
             print("|algoSend Error| : Message format error")
 
+<<<<<<< HEAD
     except IndexError:
 	andQueue.append(tempBuffer[1:])
 	print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
 	
     except Exception:
 #	print(e)
+=======
+    except Exception:
+>>>>>>> 35517bc3292d0e8b956035f8b42a38dc825c1f36
         print("algoRead Error")
         
         global algoCon
@@ -88,7 +97,11 @@ def algoSend():
         if len(algoQueue) > 0:
             message = algoQueue.popleft()
             algoCon.send(message)
+<<<<<<< HEAD
             print("%s: Message to Algo: %s" %(time.ctime(), message))
+=======
+            print("%s - algoSend(): Message to Algo: %s" %(time.ctime(), message))
+>>>>>>> 35517bc3292d0e8b956035f8b42a38dc825c1f36
             
     except Exception:
         print("algoSend Error")        
@@ -117,6 +130,10 @@ def serialReceive():
                 sys.exit("NO SERIAL CONNECTION")
                     
             elif tempBuffer != '':
+<<<<<<< HEAD
+=======
+            #if (tempBuffer is not '' or tempBuffer is not None or len(tempBuffer) != 0):
+>>>>>>> 35517bc3292d0e8b956035f8b42a38dc825c1f36
                 algoQueue.append(tempBuffer)
                 print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
 
@@ -166,9 +183,15 @@ def andSend():
         if len(andQueue) > 0:
             message = andQueue.popleft()
             andCon.send(message + "\n")
+<<<<<<< HEAD
             print("%s: Message to Android: %s" %(time.ctime(), message))
 
         time.sleep(0.5)
+=======
+            print("%s - andSend(): Message to Android: %s" %(time.ctime(), message))
+
+        time.sleep(1)
+>>>>>>> 35517bc3292d0e8b956035f8b42a38dc825c1f36
 
     except Exception:
         print("andSend Error")
@@ -240,4 +263,8 @@ try:
         pass
     
 except KeyboardInterrupt:
+<<<<<<< HEAD
     print("Threads Killed")
+=======
+    print("Threads Killed")
+>>>>>>> 35517bc3292d0e8b956035f8b42a38dc825c1f36
