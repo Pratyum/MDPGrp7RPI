@@ -42,20 +42,15 @@ def algoRead():
         if (str(tempBuffer)[0] == 'a'):
             #send to robot
             serialQueue.append(tempBuffer[1:])
-            print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer)) 
 
         elif (str(tempBuffer)[0] == 'b'):
             checkIndex = tempBuffer.find('|')
             if tempBuffer[checkIndex+1] == 'a':
                 andQueue.append(tempBuffer[1:checkIndex+1])
                 serialQueue.append(tempBuffer[checkIndex+2:])
-		print("################################################")
-                print("############### Detected and Split! ############")
-		print("################################################")
-		print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))       
+		
 	    else:
 	        andQueue.append(tempBuffer[1:])
-		print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
         
         elif (tempBuffer == 2):
             raise AttributeError("HI")
@@ -64,7 +59,6 @@ def algoRead():
 
     except IndexError:
 	andQueue.append(tempBuffer[1:])
-	print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
 	
     except Exception:
 #	print(e)
@@ -91,7 +85,6 @@ def algoSend():
         if len(algoQueue) > 0:
             message = algoQueue.popleft()
             algoCon.send(message)
-            print("%s: Message to Algo: %s" %(time.ctime(), message))
             
     except Exception:
         print("algoSend Error")        
@@ -105,7 +98,6 @@ def serialSend():
             if (len(serialQueue) > 0):
                 message = serialQueue.popleft()
                 serialCon.send(message)
-                print("%s: Message to serial: %s" % (time.ctime(), message))
 
         except Exception:
             print("serialSend Error")
@@ -121,7 +113,6 @@ def serialReceive():
                     
             elif tempBuffer != '':
                 algoQueue.append(tempBuffer)
-                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
 
         except Exception:
             print("serialReceive Error")
@@ -135,11 +126,10 @@ def andRead():
         if (str(tempBuffer)[0] == 'c'):
             #send to robot
             serialQueue.append(tempBuffer[1:])
-            print("%s: Message From Android: %s" %(time.ctime(), tempBuffer)) 
-
+            
         elif (str(tempBuffer)[0] == 'd'):
             algoQueue.append(tempBuffer[1:])
-            print("%s: Message From Android: %s" %(time.ctime(), tempBuffer))      
+            
         elif (tempBuffer == 2):
             raise AttributeError("HI")
             
@@ -169,7 +159,6 @@ def andSend():
         if len(andQueue) > 0:
             message = andQueue.popleft()
             andCon.send(message + "\n")
-            print("%s: Message to Android: %s" %(time.ctime(), message))
 
         time.sleep(0.5)
 
@@ -232,10 +221,8 @@ def algoConCon():
 def godConCon():
     global godCon
     
-    print("Waiting for God to Connect...")
     godCon = Godcon()
     godCon.listen()
-    print("God has arrived :D")
     
     
 try:
@@ -261,7 +248,6 @@ try:
             pass
         
         except Exception:
-            print("God is taking a smoke break, one moment...")
             time.sleep(2)
             
             godCon = None

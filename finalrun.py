@@ -5,16 +5,12 @@ import sys
 from andcon import *
 from serialcon import *
 from tcpcon import * 
-from godcon import *
 from collections import deque
 
-bool_check = False
 serialCon = None
 algoCon = None
 andCon = None
-godCon = None
-andRead_thread = None
-andSend_thread = None
+andThread_thread = None 
 algoRead_thread = None
 algoSend_thread = None 
 
@@ -42,20 +38,20 @@ def algoRead():
         if (str(tempBuffer)[0] == 'a'):
             #send to robot
             serialQueue.append(tempBuffer[1:])
-            print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer)) 
+            #print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer)) 
 
         elif (str(tempBuffer)[0] == 'b'):
             checkIndex = tempBuffer.find('|')
             if tempBuffer[checkIndex+1] == 'a':
                 andQueue.append(tempBuffer[1:checkIndex+1])
                 serialQueue.append(tempBuffer[checkIndex+2:])
-		print("################################################")
-                print("############### Detected and Split! ############")
-		print("################################################")
-		print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))       
+		#print("################################################")
+        #        print("############### Detected and Split! ############")
+		#print("################################################")
+		#print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))       
 	    else:
 	        andQueue.append(tempBuffer[1:])
-		print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
+		#print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
         
         elif (tempBuffer == 2):
             raise AttributeError("HI")
@@ -64,7 +60,7 @@ def algoRead():
 
     except IndexError:
 	andQueue.append(tempBuffer[1:])
-	print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
+	#print("%s: Message From Algo: %s" %(time.ctime(), tempBuffer))
 	
     except Exception:
 #	print(e)
@@ -91,7 +87,7 @@ def algoSend():
         if len(algoQueue) > 0:
             message = algoQueue.popleft()
             algoCon.send(message)
-            print("%s: Message to Algo: %s" %(time.ctime(), message))
+            #print("%s: Message to Algo: %s" %(time.ctime(), message))
             
     except Exception:
         print("algoSend Error")        
@@ -121,63 +117,56 @@ def serialReceive():
                     
             elif tempBuffer != '':
                 algoQueue.append(tempBuffer)
-                print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
+                #print("%s: Message from serial: %s" % (time.ctime(),tempBuffer))
 
         except Exception:
             print("serialReceive Error")
             time.sleep(1)
             pass
 
-    
-def andRead():
+def andThread():
     try:
-        tempBuffer = andCon.receive() 
-        if (str(tempBuffer)[0] == 'c'):
-            #send to robot
-            serialQueue.append(tempBuffer[1:])
-            print("%s: Message From Android: %s" %(time.ctime(), tempBuffer)) 
+        tempBuffer = andCon.receive()
+        if (tempBuffer != ''):
+            if (str(tempBuffer)[0] == 'c'):
+                #send to robot
+                serialQueue.append(tempBuffer[1:])
+                #print("%s: Message From Android: %s" %(time.ctime(), tempBuffer)) 
 
-        elif (str(tempBuffer)[0] == 'd'):
-            algoQueue.append(tempBuffer[1:])
-            print("%s: Message From Android: %s" %(time.ctime(), tempBuffer))      
-        elif (tempBuffer == 2):
-            raise AttributeError("HI")
-            
-        else:
-            print("|andSend Error| : Message format error")
+            elif (str(tempBuffer)[0] == 'd'):
+                algoQueue.append(tempBuffer[1:])
+                time.sleep(1)
+                #print("%s: Message From Android: %s" %(time.ctime(), tempBuffer))
 
-    except Exception:
-        print("andRead Error")
-        global andRead_thread
-        global andSend_thread
-        global andCon
+            elif (tempBuffer == 2):
+                raise AttributeError("HI")
+
+            else:
+                print("|andSend Error| : Message format error")
         
-        andRead_thread.stop()
-        andSend_thread.stop()
-        andCon = None 
-        
-        andConCon()
-        
-        time.sleep(1)
-        pass
-        
-def andSend():
-    try:
         andCon.send('')
         andCon.send('')
         
         if len(andQueue) > 0:
             message = andQueue.popleft()
             andCon.send(message + "\n")
-            print("%s: Message to Android: %s" %(time.ctime(), message))
+            #print("%s: Message to Android: %s" %(time.ctime(), message))
 
-        time.sleep(0.5)
-
+        time.sleep(0.8)
+        
     except Exception:
-        print("andSend Error")
+        print("andRead Error")
+        global andThread_thread
+        global andCon
+        
+        andThread_thread.stop()
+        andCon = None 
+        
+        andConCon()
+        
         time.sleep(1)
         pass
-
+    
 def serialConCon():
     global serialCon
     serialCon = Seriouscon()
@@ -203,13 +192,9 @@ def andConCon():
     andCon.listen()
     print("Android Connection Up\n\n")
     
-    andRead_thread = RPIThread(function=andRead)
-    andRead_thread.daemon = True
-    andRead_thread.start()
-
-    andSend_thread = RPIThread(function=andSend)
-    andSend_thread.daemon = True
-    andSend_thread.start()
+    andThread_thread = RPIThread(function=andThread)
+    andThread_thread.daemon = True
+    andThread_thread.start()
     
 def algoConCon():
     global algoCon
@@ -229,18 +214,7 @@ def algoConCon():
     algoRead_thread.daemon = True
     algoRead_thread.start()
     
-def godConCon():
-    global godCon
-    
-    print("Waiting for God to Connect...")
-    godCon = Godcon()
-    godCon.listen()
-    print("God has arrived :D")
-    
-    
 try:
-    global godCon
-    
     serialQueue = deque([])
     andQueue = deque([])
     algoQueue = deque([])
@@ -248,25 +222,10 @@ try:
     serialConCon()
     andConCon()
     algoConCon()
-    godConCon()
 
-    print("All Connections Up!")
-    print("Ready to go!")
-    print("Boh Bi A+ 300/300 10 Seconds!")
-    
     while True:
-        try:
-            tempBuffer = godCon.receive()
-            serialQueue.append(tempBuffer)
-            pass
-        
-        except Exception:
-            print("God is taking a smoke break, one moment...")
-            time.sleep(2)
-            
-            godCon = None
-            godConCon()
-            
+        time.sleep(8888) 
+        pass
     
 except KeyboardInterrupt:
     print("Threads Killed")
